@@ -1,4 +1,4 @@
-当前项目仅保留mac amd64的构建 因为我当前的机器就是macmin 所有仓库名称 mini-go
+当前项目仅保留darwin/amd64的构建 因为我当前的机器就是macmin 所有仓库名称 mini-go
 
 构建
 ```
