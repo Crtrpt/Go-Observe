@@ -1,3 +1,4 @@
+当前项目仅保留mac arm64的构建 因为我当前的机器就是macmin 所有仓库名称 minigo
 # The Go Programming Language
 
 Go is an open source programming language that makes it easy to build simple,
