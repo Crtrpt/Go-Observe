@@ -1,3 +1,11 @@
+当前项目仅保留darwin/amd64的构建 因为我当前的机器就是macmin 所有仓库名称 mini-go
+
+构建
+```
+./make.bash -v
+```
+修改列表
+- 删除ssa 出了 amd64 意外的全部 ssa 优化
 # The Go Programming Language
 
 Go is an open source programming language that makes it easy to build simple,
