@@ -538,21 +538,21 @@ func (lv *liveness) markUnsafePoints() {
 					load = v
 					break
 				}
-				switch v.Op {
-				case ssa.Op386TESTL:
-					// 386 lowers Neq32 to (TESTL cond cond),
-					if v.Args[0] == v.Args[1] {
-						v = v.Args[0]
-						continue
-					}
-				case ssa.Op386MOVLload, ssa.OpARM64MOVWUload, ssa.OpPPC64MOVWZload, ssa.OpWasmI64Load32U:
-					// Args[0] is the address of the write
-					// barrier control. Ignore Args[1],
-					// which is the mem operand.
-					// TODO: Just ignore mem operands?
-					v = v.Args[0]
-					continue
-				}
+				// switch v.Op {
+				// case ssa.Op386TESTL:
+				// 	// 386 lowers Neq32 to (TESTL cond cond),
+				// 	if v.Args[0] == v.Args[1] {
+				// 		v = v.Args[0]
+				// 		continue
+				// 	}
+				// case ssa.Op386MOVLload, ssa.OpARM64MOVWUload, ssa.OpPPC64MOVWZload, ssa.OpWasmI64Load32U:
+				// 	// Args[0] is the address of the write
+				// 	// barrier control. Ignore Args[1],
+				// 	// which is the mem operand.
+				// 	// TODO: Just ignore mem operands?
+				// 	v = v.Args[0]
+				// 	continue
+				// }
 				// Common case: just flow backwards.
 				if len(v.Args) != 1 {
 					v.Fatalf("write barrier control value has more than one argument: %s", v.LongString())

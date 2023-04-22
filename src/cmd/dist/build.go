@@ -62,7 +62,7 @@ var (
 
 // The known architectures.
 var okgoarch = []string{
-	"386",
+	 "386",
 	"amd64",
 	"arm",
 	"arm64",
@@ -422,7 +422,7 @@ func findgoversion() string {
 	if m == nil {
 		fatalf("internal/goversion/goversion.go does not contain 'const Version = ...'")
 	}
-	version := fmt.Sprintf("devel go1.%s-", m[1])
+	version := fmt.Sprintf("devel mini_go1.%s-", m[1])
 	version += chomp(run(goroot, CheckExit, "git", "log", "-n", "1", "--format=format:%h %cd", "HEAD"))
 
 	// Cache version.

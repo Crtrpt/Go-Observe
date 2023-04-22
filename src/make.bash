@@ -167,6 +167,10 @@ nogoenv() {
 }
 
 export GOROOT="$(cd .. && pwd)"
+
+
+echo $GOROOT
+echo $GOROOT_BOOTSTRAP
 IFS=$'\n'; for go_exe in $(type -ap go); do
 	if [ ! -x "$GOROOT_BOOTSTRAP/bin/go" ]; then
 		goroot=$(GOROOT= nogoenv "$go_exe" env GOROOT)
@@ -184,10 +188,19 @@ if [ ! -x "$GOROOT_BOOTSTRAP/bin/go" ]; then
 	echo "Set \$GOROOT_BOOTSTRAP to a working Go tree >= Go $bootgo." >&2
 	exit 1
 fi
+
+
+
 # Get the exact bootstrap toolchain version to help with debugging.
 # We clear GOOS and GOARCH to avoid an ominous but harmless warning if
 # the bootstrap doesn't support them.
 GOROOT_BOOTSTRAP_VERSION=$(nogoenv "$GOROOT_BOOTSTRAP/bin/go" version | sed 's/go version //')
+
+
+echo "--->$GOROOT"
+echo "--->$GOROOT_BOOTSTRAP"
+
+
 echo "Building Go cmd/dist using $GOROOT_BOOTSTRAP. ($GOROOT_BOOTSTRAP_VERSION)"
 if $verbose; then
 	echo cmd/dist
@@ -198,6 +211,9 @@ if [ "$GOROOT_BOOTSTRAP" = "$GOROOT" ]; then
 	exit 1
 fi
 rm -f cmd/dist/dist
+
+echo "--->$GOROOT_BOOTSTRAP/bin/go"
+
 GOROOT="$GOROOT_BOOTSTRAP" nogoenv "$GOROOT_BOOTSTRAP/bin/go" build -o cmd/dist/dist ./cmd/dist
 
 # -e doesn't propagate out of eval, so check success by hand.

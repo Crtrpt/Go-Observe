@@ -93,9 +93,14 @@ func (h ValHeap) Less(i, j int) bool {
 
 func (op Op) isLoweredGetClosurePtr() bool {
 	switch op {
-	case OpAMD64LoweredGetClosurePtr, OpPPC64LoweredGetClosurePtr, OpARMLoweredGetClosurePtr, OpARM64LoweredGetClosurePtr,
-		Op386LoweredGetClosurePtr, OpMIPS64LoweredGetClosurePtr, OpLOONG64LoweredGetClosurePtr, OpS390XLoweredGetClosurePtr, OpMIPSLoweredGetClosurePtr,
-		OpRISCV64LoweredGetClosurePtr, OpWasmLoweredGetClosurePtr:
+	// case OpAMD64LoweredGetClosurePtr, OpPPC64LoweredGetClosurePtr, OpARMLoweredGetClosurePtr, OpARM64LoweredGetClosurePtr,
+	// 	Op386LoweredGetClosurePtr, OpMIPS64LoweredGetClosurePtr, OpLOONG64LoweredGetClosurePtr, OpS390XLoweredGetClosurePtr, OpMIPSLoweredGetClosurePtr,
+	// 	OpRISCV64LoweredGetClosurePtr, OpWasmLoweredGetClosurePtr:
+	// 	return true
+	case OpAMD64LoweredGetClosurePtr:
+		// OpPPC64LoweredGetClosurePtr, OpARMLoweredGetClosurePtr, OpARM64LoweredGetClosurePtr,
+		// Op386LoweredGetClosurePtr, OpMIPS64LoweredGetClosurePtr, OpLOONG64LoweredGetClosurePtr, OpS390XLoweredGetClosurePtr, OpMIPSLoweredGetClosurePtr,
+		// OpRISCV64LoweredGetClosurePtr, OpWasmLoweredGetClosurePtr
 		return true
 	}
 	return false
@@ -534,10 +539,10 @@ func (v *Value) isFlagOp() bool {
 	}
 	// PPC64 carry generators put their carry in a non-flag-typed register
 	// in their output.
-	switch v.Op {
-	case OpPPC64SUBC, OpPPC64ADDC, OpPPC64SUBCconst, OpPPC64ADDCconst:
-		return true
-	}
+	// switch v.Op {
+	// case OpPPC64SUBC, OpPPC64ADDC, OpPPC64SUBCconst, OpPPC64ADDCconst:
+	// 	return true
+	// }
 	return false
 }
 
@@ -550,10 +555,10 @@ func (v *Value) hasFlagInput() bool {
 	}
 	// PPC64 carry dependencies are conveyed through their final argument,
 	// so we treat those operations as taking flags as well.
-	switch v.Op {
-	case OpPPC64SUBE, OpPPC64ADDE, OpPPC64SUBZEzero, OpPPC64ADDZEzero:
-		return true
-	}
+	// switch v.Op {
+	// case OpPPC64SUBE, OpPPC64ADDE, OpPPC64SUBZEzero, OpPPC64ADDZEzero:
+	// 	return true
+	// }
 	return false
 }
 

@@ -192,148 +192,148 @@ func NewConfig(arch string, types Types, ctxt *obj.Link, optimize, softfloat boo
 		c.FPReg = framepointerRegAMD64
 		c.LinkReg = linkRegAMD64
 		c.hasGReg = true
-	case "386":
-		c.PtrSize = 4
-		c.RegSize = 4
-		c.lowerBlock = rewriteBlock386
-		c.lowerValue = rewriteValue386
-		c.splitLoad = rewriteValue386splitload
-		c.registers = registers386[:]
-		c.gpRegMask = gpRegMask386
-		c.fpRegMask = fpRegMask386
-		c.FPReg = framepointerReg386
-		c.LinkReg = linkReg386
-		c.hasGReg = false
-	case "arm":
-		c.PtrSize = 4
-		c.RegSize = 4
-		c.lowerBlock = rewriteBlockARM
-		c.lowerValue = rewriteValueARM
-		c.registers = registersARM[:]
-		c.gpRegMask = gpRegMaskARM
-		c.fpRegMask = fpRegMaskARM
-		c.FPReg = framepointerRegARM
-		c.LinkReg = linkRegARM
-		c.hasGReg = true
-	case "arm64":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockARM64
-		c.lowerValue = rewriteValueARM64
-		c.lateLowerBlock = rewriteBlockARM64latelower
-		c.lateLowerValue = rewriteValueARM64latelower
-		c.registers = registersARM64[:]
-		c.gpRegMask = gpRegMaskARM64
-		c.fpRegMask = fpRegMaskARM64
-		c.intParamRegs = paramIntRegARM64
-		c.floatParamRegs = paramFloatRegARM64
-		c.FPReg = framepointerRegARM64
-		c.LinkReg = linkRegARM64
-		c.hasGReg = true
-	case "ppc64":
-		c.BigEndian = true
-		fallthrough
-	case "ppc64le":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockPPC64
-		c.lowerValue = rewriteValuePPC64
-		c.lateLowerBlock = rewriteBlockPPC64latelower
-		c.lateLowerValue = rewriteValuePPC64latelower
-		c.registers = registersPPC64[:]
-		c.gpRegMask = gpRegMaskPPC64
-		c.fpRegMask = fpRegMaskPPC64
-		c.specialRegMask = specialRegMaskPPC64
-		c.intParamRegs = paramIntRegPPC64
-		c.floatParamRegs = paramFloatRegPPC64
-		c.FPReg = framepointerRegPPC64
-		c.LinkReg = linkRegPPC64
-		c.hasGReg = true
-	case "mips64":
-		c.BigEndian = true
-		fallthrough
-	case "mips64le":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockMIPS64
-		c.lowerValue = rewriteValueMIPS64
-		c.registers = registersMIPS64[:]
-		c.gpRegMask = gpRegMaskMIPS64
-		c.fpRegMask = fpRegMaskMIPS64
-		c.specialRegMask = specialRegMaskMIPS64
-		c.FPReg = framepointerRegMIPS64
-		c.LinkReg = linkRegMIPS64
-		c.hasGReg = true
-	case "loong64":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockLOONG64
-		c.lowerValue = rewriteValueLOONG64
-		c.registers = registersLOONG64[:]
-		c.gpRegMask = gpRegMaskLOONG64
-		c.fpRegMask = fpRegMaskLOONG64
-		c.FPReg = framepointerRegLOONG64
-		c.LinkReg = linkRegLOONG64
-		c.hasGReg = true
-	case "s390x":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockS390X
-		c.lowerValue = rewriteValueS390X
-		c.registers = registersS390X[:]
-		c.gpRegMask = gpRegMaskS390X
-		c.fpRegMask = fpRegMaskS390X
-		c.FPReg = framepointerRegS390X
-		c.LinkReg = linkRegS390X
-		c.hasGReg = true
-		c.noDuffDevice = true
-		c.BigEndian = true
-	case "mips":
-		c.BigEndian = true
-		fallthrough
-	case "mipsle":
-		c.PtrSize = 4
-		c.RegSize = 4
-		c.lowerBlock = rewriteBlockMIPS
-		c.lowerValue = rewriteValueMIPS
-		c.registers = registersMIPS[:]
-		c.gpRegMask = gpRegMaskMIPS
-		c.fpRegMask = fpRegMaskMIPS
-		c.specialRegMask = specialRegMaskMIPS
-		c.FPReg = framepointerRegMIPS
-		c.LinkReg = linkRegMIPS
-		c.hasGReg = true
-		c.noDuffDevice = true
-	case "riscv64":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockRISCV64
-		c.lowerValue = rewriteValueRISCV64
-		c.lateLowerBlock = rewriteBlockRISCV64latelower
-		c.lateLowerValue = rewriteValueRISCV64latelower
-		c.registers = registersRISCV64[:]
-		c.gpRegMask = gpRegMaskRISCV64
-		c.fpRegMask = fpRegMaskRISCV64
-		c.intParamRegs = paramIntRegRISCV64
-		c.floatParamRegs = paramFloatRegRISCV64
-		c.FPReg = framepointerRegRISCV64
-		c.hasGReg = true
-	case "wasm":
-		c.PtrSize = 8
-		c.RegSize = 8
-		c.lowerBlock = rewriteBlockWasm
-		c.lowerValue = rewriteValueWasm
-		c.registers = registersWasm[:]
-		c.gpRegMask = gpRegMaskWasm
-		c.fpRegMask = fpRegMaskWasm
-		c.fp32RegMask = fp32RegMaskWasm
-		c.fp64RegMask = fp64RegMaskWasm
-		c.FPReg = framepointerRegWasm
-		c.LinkReg = linkRegWasm
-		c.hasGReg = true
-		c.noDuffDevice = true
-		c.useAvg = false
-		c.useHmul = false
+	// case "386":
+	// 	c.PtrSize = 4
+	// 	c.RegSize = 4
+	// 	c.lowerBlock = rewriteBlock386
+	// 	c.lowerValue = rewriteValue386
+	// 	c.splitLoad = rewriteValue386splitload
+	// 	c.registers = registers386[:]
+	// 	c.gpRegMask = gpRegMask386
+	// 	c.fpRegMask = fpRegMask386
+	// 	c.FPReg = framepointerReg386
+	// 	c.LinkReg = linkReg386
+	// 	c.hasGReg = false
+	// case "arm":
+	// 	c.PtrSize = 4
+	// 	c.RegSize = 4
+	// 	c.lowerBlock = rewriteBlockARM
+	// 	c.lowerValue = rewriteValueARM
+	// 	c.registers = registersARM[:]
+	// 	c.gpRegMask = gpRegMaskARM
+	// 	c.fpRegMask = fpRegMaskARM
+	// 	c.FPReg = framepointerRegARM
+	// 	c.LinkReg = linkRegARM
+	// 	c.hasGReg = true
+	// case "arm64":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockARM64
+	// 	c.lowerValue = rewriteValueARM64
+	// 	c.lateLowerBlock = rewriteBlockARM64latelower
+	// 	c.lateLowerValue = rewriteValueARM64latelower
+	// 	c.registers = registersARM64[:]
+	// 	c.gpRegMask = gpRegMaskARM64
+	// 	c.fpRegMask = fpRegMaskARM64
+	// 	c.intParamRegs = paramIntRegARM64
+	// 	c.floatParamRegs = paramFloatRegARM64
+	// 	c.FPReg = framepointerRegARM64
+	// 	c.LinkReg = linkRegARM64
+	// 	c.hasGReg = true
+	// case "ppc64":
+	// 	c.BigEndian = true
+	// 	fallthrough
+	// case "ppc64le":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockPPC64
+	// 	c.lowerValue = rewriteValuePPC64
+	// 	c.lateLowerBlock = rewriteBlockPPC64latelower
+	// 	c.lateLowerValue = rewriteValuePPC64latelower
+	// 	c.registers = registersPPC64[:]
+	// 	c.gpRegMask = gpRegMaskPPC64
+	// 	c.fpRegMask = fpRegMaskPPC64
+	// 	c.specialRegMask = specialRegMaskPPC64
+	// 	c.intParamRegs = paramIntRegPPC64
+	// 	c.floatParamRegs = paramFloatRegPPC64
+	// 	c.FPReg = framepointerRegPPC64
+	// 	c.LinkReg = linkRegPPC64
+	// 	c.hasGReg = true
+	// case "mips64":
+	// 	c.BigEndian = true
+	// 	fallthrough
+	// case "mips64le":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockMIPS64
+	// 	c.lowerValue = rewriteValueMIPS64
+	// 	c.registers = registersMIPS64[:]
+	// 	c.gpRegMask = gpRegMaskMIPS64
+	// 	c.fpRegMask = fpRegMaskMIPS64
+	// 	c.specialRegMask = specialRegMaskMIPS64
+	// 	c.FPReg = framepointerRegMIPS64
+	// 	c.LinkReg = linkRegMIPS64
+	// 	c.hasGReg = true
+	// case "loong64":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockLOONG64
+	// 	c.lowerValue = rewriteValueLOONG64
+	// 	c.registers = registersLOONG64[:]
+	// 	c.gpRegMask = gpRegMaskLOONG64
+	// 	c.fpRegMask = fpRegMaskLOONG64
+	// 	c.FPReg = framepointerRegLOONG64
+	// 	c.LinkReg = linkRegLOONG64
+	// 	c.hasGReg = true
+	// case "s390x":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockS390X
+	// 	c.lowerValue = rewriteValueS390X
+	// 	c.registers = registersS390X[:]
+	// 	c.gpRegMask = gpRegMaskS390X
+	// 	c.fpRegMask = fpRegMaskS390X
+	// 	c.FPReg = framepointerRegS390X
+	// 	c.LinkReg = linkRegS390X
+	// 	c.hasGReg = true
+	// 	c.noDuffDevice = true
+	// 	c.BigEndian = true
+	// case "mips":
+	// 	c.BigEndian = true
+	// 	fallthrough
+	// case "mipsle":
+	// 	c.PtrSize = 4
+	// 	c.RegSize = 4
+	// 	c.lowerBlock = rewriteBlockMIPS
+	// 	c.lowerValue = rewriteValueMIPS
+	// 	c.registers = registersMIPS[:]
+	// 	c.gpRegMask = gpRegMaskMIPS
+	// 	c.fpRegMask = fpRegMaskMIPS
+	// 	c.specialRegMask = specialRegMaskMIPS
+	// 	c.FPReg = framepointerRegMIPS
+	// 	c.LinkReg = linkRegMIPS
+	// 	c.hasGReg = true
+	// 	c.noDuffDevice = true
+	// case "riscv64":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockRISCV64
+	// 	c.lowerValue = rewriteValueRISCV64
+	// 	c.lateLowerBlock = rewriteBlockRISCV64latelower
+	// 	c.lateLowerValue = rewriteValueRISCV64latelower
+	// 	c.registers = registersRISCV64[:]
+	// 	c.gpRegMask = gpRegMaskRISCV64
+	// 	c.fpRegMask = fpRegMaskRISCV64
+	// 	c.intParamRegs = paramIntRegRISCV64
+	// 	c.floatParamRegs = paramFloatRegRISCV64
+	// 	c.FPReg = framepointerRegRISCV64
+	// 	c.hasGReg = true
+	// case "wasm":
+	// 	c.PtrSize = 8
+	// 	c.RegSize = 8
+	// 	c.lowerBlock = rewriteBlockWasm
+	// 	c.lowerValue = rewriteValueWasm
+	// 	c.registers = registersWasm[:]
+	// 	c.gpRegMask = gpRegMaskWasm
+	// 	c.fpRegMask = fpRegMaskWasm
+	// 	c.fp32RegMask = fp32RegMaskWasm
+	// 	c.fp64RegMask = fp64RegMaskWasm
+	// 	c.FPReg = framepointerRegWasm
+	// 	c.LinkReg = linkRegWasm
+	// 	c.hasGReg = true
+	// 	c.noDuffDevice = true
+	// 	c.useAvg = false
+	// 	c.useHmul = false
 	default:
 		ctxt.Diag("arch %s not implemented", arch)
 	}
@@ -365,7 +365,9 @@ func NewConfig(arch string, types Types, ctxt *obj.Link, optimize, softfloat boo
 		// LoweredWB is secretly a CALL and CALLs on 386 in
 		// shared mode get rewritten by obj6.go to go through
 		// the GOT, which clobbers BX.
-		opcodeTable[Op386LoweredWB].reg.clobbers |= 1 << 3 // BX
+		
+
+		// opcodeTable[Op386LoweredWB].reg.clobbers |= 1 << 3 // BX
 	}
 
 	// Create the GC register map index.

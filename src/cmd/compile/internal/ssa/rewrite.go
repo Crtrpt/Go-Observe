@@ -9,7 +9,7 @@ import (
 	"cmd/compile/internal/logopt"
 	"cmd/compile/internal/types"
 	"cmd/internal/obj"
-	"cmd/internal/obj/s390x"
+	// "cmd/internal/obj/s390x"
 	"cmd/internal/objabi"
 	"cmd/internal/src"
 	"encoding/binary"
@@ -751,12 +751,12 @@ func auxToType(i Aux) *types.Type {
 func auxToCall(i Aux) *AuxCall {
 	return i.(*AuxCall)
 }
-func auxToS390xCCMask(i Aux) s390x.CCMask {
-	return i.(s390x.CCMask)
-}
-func auxToS390xRotateParams(i Aux) s390x.RotateParams {
-	return i.(s390x.RotateParams)
-}
+// func auxToS390xCCMask(i Aux) s390x.CCMask {
+// 	return i.(s390x.CCMask)
+// }
+// func auxToS390xRotateParams(i Aux) s390x.RotateParams {
+// 	return i.(s390x.RotateParams)
+// }
 
 func StringToAux(s string) Aux {
 	return stringAux(s)
@@ -770,12 +770,12 @@ func callToAux(s *AuxCall) Aux {
 func typeToAux(t *types.Type) Aux {
 	return t
 }
-func s390xCCMaskToAux(c s390x.CCMask) Aux {
-	return c
-}
-func s390xRotateParamsToAux(r s390x.RotateParams) Aux {
-	return r
-}
+// func s390xCCMaskToAux(c s390x.CCMask) Aux {
+// 	return c
+// }
+// func s390xRotateParamsToAux(r s390x.RotateParams) Aux {
+// 	return r
+// }
 
 // uaddOvf reports whether unsigned a+b would overflow.
 func uaddOvf(a, b int64) bool {
@@ -1034,46 +1034,47 @@ func flagArg(v *Value) *Value {
 // For floating point, it's more subtle because NaN is unordered. We do
 // !LessThanF -> NotLessThanF, the latter takes care of NaNs.
 func arm64Negate(op Op) Op {
-	switch op {
-	case OpARM64LessThan:
-		return OpARM64GreaterEqual
-	case OpARM64LessThanU:
-		return OpARM64GreaterEqualU
-	case OpARM64GreaterThan:
-		return OpARM64LessEqual
-	case OpARM64GreaterThanU:
-		return OpARM64LessEqualU
-	case OpARM64LessEqual:
-		return OpARM64GreaterThan
-	case OpARM64LessEqualU:
-		return OpARM64GreaterThanU
-	case OpARM64GreaterEqual:
-		return OpARM64LessThan
-	case OpARM64GreaterEqualU:
-		return OpARM64LessThanU
-	case OpARM64Equal:
-		return OpARM64NotEqual
-	case OpARM64NotEqual:
-		return OpARM64Equal
-	case OpARM64LessThanF:
-		return OpARM64NotLessThanF
-	case OpARM64NotLessThanF:
-		return OpARM64LessThanF
-	case OpARM64LessEqualF:
-		return OpARM64NotLessEqualF
-	case OpARM64NotLessEqualF:
-		return OpARM64LessEqualF
-	case OpARM64GreaterThanF:
-		return OpARM64NotGreaterThanF
-	case OpARM64NotGreaterThanF:
-		return OpARM64GreaterThanF
-	case OpARM64GreaterEqualF:
-		return OpARM64NotGreaterEqualF
-	case OpARM64NotGreaterEqualF:
-		return OpARM64GreaterEqualF
-	default:
-		panic("unreachable")
-	}
+	// switch op {
+	// case OpARM64LessThan:
+	// 	return OpARM64GreaterEqual
+	// case OpARM64LessThanU:
+	// 	return OpARM64GreaterEqualU
+	// case OpARM64GreaterThan:
+	// 	return OpARM64LessEqual
+	// case OpARM64GreaterThanU:
+	// 	return OpARM64LessEqualU
+	// case OpARM64LessEqual:
+	// 	return OpARM64GreaterThan
+	// case OpARM64LessEqualU:
+	// 	return OpARM64GreaterThanU
+	// case OpARM64GreaterEqual:
+	// 	return OpARM64LessThan
+	// case OpARM64GreaterEqualU:
+	// 	return OpARM64LessThanU
+	// case OpARM64Equal:
+	// 	return OpARM64NotEqual
+	// case OpARM64NotEqual:
+	// 	return OpARM64Equal
+	// case OpARM64LessThanF:
+	// 	return OpARM64NotLessThanF
+	// case OpARM64NotLessThanF:
+	// 	return OpARM64LessThanF
+	// case OpARM64LessEqualF:
+	// 	return OpARM64NotLessEqualF
+	// case OpARM64NotLessEqualF:
+	// 	return OpARM64LessEqualF
+	// case OpARM64GreaterThanF:
+	// 	return OpARM64NotGreaterThanF
+	// case OpARM64NotGreaterThanF:
+	// 	return OpARM64GreaterThanF
+	// case OpARM64GreaterEqualF:
+	// 	return OpARM64NotGreaterEqualF
+	// case OpARM64NotGreaterEqualF:
+	// 	return OpARM64GreaterEqualF
+	// default:
+	// 	
+	// }
+	panic("unreachable")
 }
 
 // arm64Invert evaluates (InvertFlags op), which
@@ -1082,86 +1083,88 @@ func arm64Negate(op Op) Op {
 // to the flag-generating instruction were reversed, e.g.
 // (InvertFlags (CMP x y)) -> (CMP y x)
 func arm64Invert(op Op) Op {
-	switch op {
-	case OpARM64LessThan:
-		return OpARM64GreaterThan
-	case OpARM64LessThanU:
-		return OpARM64GreaterThanU
-	case OpARM64GreaterThan:
-		return OpARM64LessThan
-	case OpARM64GreaterThanU:
-		return OpARM64LessThanU
-	case OpARM64LessEqual:
-		return OpARM64GreaterEqual
-	case OpARM64LessEqualU:
-		return OpARM64GreaterEqualU
-	case OpARM64GreaterEqual:
-		return OpARM64LessEqual
-	case OpARM64GreaterEqualU:
-		return OpARM64LessEqualU
-	case OpARM64Equal, OpARM64NotEqual:
-		return op
-	case OpARM64LessThanF:
-		return OpARM64GreaterThanF
-	case OpARM64GreaterThanF:
-		return OpARM64LessThanF
-	case OpARM64LessEqualF:
-		return OpARM64GreaterEqualF
-	case OpARM64GreaterEqualF:
-		return OpARM64LessEqualF
-	case OpARM64NotLessThanF:
-		return OpARM64NotGreaterThanF
-	case OpARM64NotGreaterThanF:
-		return OpARM64NotLessThanF
-	case OpARM64NotLessEqualF:
-		return OpARM64NotGreaterEqualF
-	case OpARM64NotGreaterEqualF:
-		return OpARM64NotLessEqualF
-	default:
-		panic("unreachable")
-	}
+	// switch op {
+	// case OpARM64LessThan:
+	// 	return OpARM64GreaterThan
+	// case OpARM64LessThanU:
+	// 	return OpARM64GreaterThanU
+	// case OpARM64GreaterThan:
+	// 	return OpARM64LessThan
+	// case OpARM64GreaterThanU:
+	// 	return OpARM64LessThanU
+	// case OpARM64LessEqual:
+	// 	return OpARM64GreaterEqual
+	// case OpARM64LessEqualU:
+	// 	return OpARM64GreaterEqualU
+	// case OpARM64GreaterEqual:
+	// 	return OpARM64LessEqual
+	// case OpARM64GreaterEqualU:
+	// 	return OpARM64LessEqualU
+	// case OpARM64Equal, OpARM64NotEqual:
+	// 	return op
+	// case OpARM64LessThanF:
+	// 	return OpARM64GreaterThanF
+	// case OpARM64GreaterThanF:
+	// 	return OpARM64LessThanF
+	// case OpARM64LessEqualF:
+	// 	return OpARM64GreaterEqualF
+	// case OpARM64GreaterEqualF:
+	// 	return OpARM64LessEqualF
+	// case OpARM64NotLessThanF:
+	// 	return OpARM64NotGreaterThanF
+	// case OpARM64NotGreaterThanF:
+	// 	return OpARM64NotLessThanF
+	// case OpARM64NotLessEqualF:
+	// 	return OpARM64NotGreaterEqualF
+	// case OpARM64NotGreaterEqualF:
+	// 	return OpARM64NotLessEqualF
+	// default:
+	// 	panic("unreachable")
+	// }
+
+	panic("unreachable")
 }
 
 // evaluate an ARM64 op against a flags value
 // that is potentially constant; return 1 for true,
 // -1 for false, and 0 for not constant.
 func ccARM64Eval(op Op, flags *Value) int {
-	fop := flags.Op
-	if fop == OpARM64InvertFlags {
-		return -ccARM64Eval(op, flags.Args[0])
-	}
-	if fop != OpARM64FlagConstant {
-		return 0
-	}
-	fc := flagConstant(flags.AuxInt)
-	b2i := func(b bool) int {
-		if b {
-			return 1
-		}
-		return -1
-	}
-	switch op {
-	case OpARM64Equal:
-		return b2i(fc.eq())
-	case OpARM64NotEqual:
-		return b2i(fc.ne())
-	case OpARM64LessThan:
-		return b2i(fc.lt())
-	case OpARM64LessThanU:
-		return b2i(fc.ult())
-	case OpARM64GreaterThan:
-		return b2i(fc.gt())
-	case OpARM64GreaterThanU:
-		return b2i(fc.ugt())
-	case OpARM64LessEqual:
-		return b2i(fc.le())
-	case OpARM64LessEqualU:
-		return b2i(fc.ule())
-	case OpARM64GreaterEqual:
-		return b2i(fc.ge())
-	case OpARM64GreaterEqualU:
-		return b2i(fc.uge())
-	}
+	// fop := flags.Op
+	// if fop == OpARM64InvertFlags {
+	// 	return -ccARM64Eval(op, flags.Args[0])
+	// }
+	// if fop != OpARM64FlagConstant {
+	// 	return 0
+	// }
+	// fc := flagConstant(flags.AuxInt)
+	// b2i := func(b bool) int {
+	// 	if b {
+	// 		return 1
+	// 	}
+	// 	return -1
+	// }
+	// switch op {
+	// case OpARM64Equal:
+	// 	return b2i(fc.eq())
+	// case OpARM64NotEqual:
+	// 	return b2i(fc.ne())
+	// case OpARM64LessThan:
+	// 	return b2i(fc.lt())
+	// case OpARM64LessThanU:
+	// 	return b2i(fc.ult())
+	// case OpARM64GreaterThan:
+	// 	return b2i(fc.gt())
+	// case OpARM64GreaterThanU:
+	// 	return b2i(fc.ugt())
+	// case OpARM64LessEqual:
+	// 	return b2i(fc.le())
+	// case OpARM64LessEqualU:
+	// 	return b2i(fc.ule())
+	// case OpARM64GreaterEqual:
+	// 	return b2i(fc.ge())
+	// case OpARM64GreaterEqualU:
+	// 	return b2i(fc.uge())
+	// }
 	return 0
 }
 
@@ -1294,9 +1297,9 @@ func zeroUpper32Bits(x *Value, depth int) bool {
 		OpAMD64SHRL, OpAMD64SHRLconst, OpAMD64SARL, OpAMD64SARLconst,
 		OpAMD64SHLL, OpAMD64SHLLconst:
 		return true
-	case OpARM64REV16W, OpARM64REVW, OpARM64RBITW, OpARM64CLZW, OpARM64EXTRWconst,
-		OpARM64MULW, OpARM64MNEGW, OpARM64UDIVW, OpARM64DIVW, OpARM64UMODW,
-		OpARM64MADDW, OpARM64MSUBW, OpARM64RORW, OpARM64RORWconst:
+	// case OpARM64REV16W, OpARM64REVW, OpARM64RBITW, OpARM64CLZW, OpARM64EXTRWconst,
+	// 	OpARM64MULW, OpARM64MNEGW, OpARM64UDIVW, OpARM64DIVW, OpARM64UMODW,
+	// 	OpARM64MADDW, OpARM64MSUBW, OpARM64RORW, OpARM64RORWconst:
 		return true
 	case OpArg:
 		return x.Type.Size() == 4
@@ -1799,16 +1802,16 @@ func sequentialAddresses(x, y *Value, n int64) bool {
 	if x == y && n == 0 {
 		return true
 	}
-	if x.Op == Op386ADDL && y.Op == Op386LEAL1 && y.AuxInt == n && y.Aux == nil &&
-		(x.Args[0] == y.Args[0] && x.Args[1] == y.Args[1] ||
-			x.Args[0] == y.Args[1] && x.Args[1] == y.Args[0]) {
-		return true
-	}
-	if x.Op == Op386LEAL1 && y.Op == Op386LEAL1 && y.AuxInt == x.AuxInt+n && x.Aux == y.Aux &&
-		(x.Args[0] == y.Args[0] && x.Args[1] == y.Args[1] ||
-			x.Args[0] == y.Args[1] && x.Args[1] == y.Args[0]) {
-		return true
-	}
+	// if x.Op == Op386ADDL && y.Op == Op386LEAL1 && y.AuxInt == n && y.Aux == nil &&
+	// 	(x.Args[0] == y.Args[0] && x.Args[1] == y.Args[1] ||
+	// 		x.Args[0] == y.Args[1] && x.Args[1] == y.Args[0]) {
+	// 	return true
+	// }
+	// if x.Op == Op386LEAL1 && y.Op == Op386LEAL1 && y.AuxInt == x.AuxInt+n && x.Aux == y.Aux &&
+	// 	(x.Args[0] == y.Args[0] && x.Args[1] == y.Args[1] ||
+	// 		x.Args[0] == y.Args[1] && x.Args[1] == y.Args[0]) {
+	// 	return true
+	// }
 	if x.Op == OpAMD64ADDQ && y.Op == OpAMD64LEAQ1 && y.AuxInt == n && y.Aux == nil &&
 		(x.Args[0] == y.Args[0] && x.Args[1] == y.Args[1] ||
 			x.Args[0] == y.Args[1] && x.Args[1] == y.Args[0]) {
