@@ -1380,29 +1380,29 @@ func preemptM(mp *m) {
 				c.set_sp(sp)
 				c.set_ip(targetPC)
 
-			case "arm":
-				// Push LR. The injected call is responsible
-				// for restoring LR. gentraceback is aware of
-				// this extra slot. See sigctxt.pushCall in
-				// signal_arm.go, which is similar except we
-				// subtract 1 from IP here.
-				sp := c.sp()
-				sp -= goarch.PtrSize
-				c.set_sp(sp)
-				*(*uint32)(unsafe.Pointer(sp)) = uint32(c.lr())
-				c.set_lr(newpc - 1)
-				c.set_ip(targetPC)
+			// case "arm":
+			// 	// Push LR. The injected call is responsible
+			// 	// for restoring LR. gentraceback is aware of
+			// 	// this extra slot. See sigctxt.pushCall in
+			// 	// signal_arm.go, which is similar except we
+			// 	// subtract 1 from IP here.
+			// 	sp := c.sp()
+			// 	sp -= goarch.PtrSize
+			// 	c.set_sp(sp)
+			// 	*(*uint32)(unsafe.Pointer(sp)) = uint32(c.lr())
+			// 	c.set_lr(newpc - 1)
+			// 	c.set_ip(targetPC)
 
-			case "arm64":
-				// Push LR. The injected call is responsible
-				// for restoring LR. gentraceback is aware of
-				// this extra slot. See sigctxt.pushCall in
-				// signal_arm64.go.
-				sp := c.sp() - 16 // SP needs 16-byte alignment
-				c.set_sp(sp)
-				*(*uint64)(unsafe.Pointer(sp)) = uint64(c.lr())
-				c.set_lr(newpc)
-				c.set_ip(targetPC)
+			// case "arm64":
+			// 	// Push LR. The injected call is responsible
+			// 	// for restoring LR. gentraceback is aware of
+			// 	// this extra slot. See sigctxt.pushCall in
+			// 	// signal_arm64.go.
+			// 	sp := c.sp() - 16 // SP needs 16-byte alignment
+			// 	c.set_sp(sp)
+			// 	*(*uint64)(unsafe.Pointer(sp)) = uint64(c.lr())
+			// 	c.set_lr(newpc)
+			// 	c.set_ip(targetPC)
 			}
 			stdcall2(_SetThreadContext, thread, uintptr(unsafe.Pointer(c)))
 		}

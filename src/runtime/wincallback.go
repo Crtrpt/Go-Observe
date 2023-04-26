@@ -121,7 +121,7 @@ const cb_max = %d // maximum number of windows callbacks allowed
 
 func main() {
 	genasm386Amd64()
-	genasmArm()
-	genasmArm64()
+	// genasmArm()
+	// genasmArm64()
 	gengo()
 }

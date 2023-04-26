@@ -396,24 +396,24 @@ func preemptM(mp *m) {
 //
 //go:nosplit
 func sigFetchG(c *sigctxt) *g {
-	switch GOARCH {
-	case "arm", "arm64", "ppc64", "ppc64le", "riscv64", "s390x":
-		if !iscgo && inVDSOPage(c.sigpc()) {
-			// When using cgo, we save the g on TLS and load it from there
-			// in sigtramp. Just use that.
-			// Otherwise, before making a VDSO call we save the g to the
-			// bottom of the signal stack. Fetch from there.
-			// TODO: in efence mode, stack is sysAlloc'd, so this wouldn't
-			// work.
-			sp := getcallersp()
-			s := spanOf(sp)
-			if s != nil && s.state.get() == mSpanManual && s.base() < sp && sp < s.limit {
-				gp := *(**g)(unsafe.Pointer(s.base()))
-				return gp
-			}
-			return nil
-		}
-	}
+	// switch GOARCH {
+	// case "arm", "arm64", "ppc64", "ppc64le", "riscv64", "s390x":
+	// 	if !iscgo && inVDSOPage(c.sigpc()) {
+	// 		// When using cgo, we save the g on TLS and load it from there
+	// 		// in sigtramp. Just use that.
+	// 		// Otherwise, before making a VDSO call we save the g to the
+	// 		// bottom of the signal stack. Fetch from there.
+	// 		// TODO: in efence mode, stack is sysAlloc'd, so this wouldn't
+	// 		// work.
+	// 		sp := getcallersp()
+	// 		s := spanOf(sp)
+	// 		if s != nil && s.state.get() == mSpanManual && s.base() < sp && sp < s.limit {
+	// 			gp := *(**g)(unsafe.Pointer(s.base()))
+	// 			return gp
+	// 		}
+	// 		return nil
+	// 	}
+	// }
 	return getg()
 }
 

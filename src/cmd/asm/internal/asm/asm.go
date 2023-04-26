@@ -10,11 +10,11 @@ import (
 	"strings"
 	"text/scanner"
 
-	"cmd/asm/internal/arch"
+	// "cmd/asm/internal/arch"
 	"cmd/asm/internal/flags"
 	"cmd/asm/internal/lex"
 	"cmd/internal/obj"
-	"cmd/internal/obj/ppc64"
+	// "cmd/internal/obj/ppc64"
 	"cmd/internal/obj/x86"
 	"cmd/internal/objabi"
 	"cmd/internal/sys"
@@ -29,19 +29,20 @@ var testOut *strings.Builder // Gathers output when testing.
 func (p *Parser) append(prog *obj.Prog, cond string, doLabel bool) {
 	if cond != "" {
 		switch p.arch.Family {
-		case sys.ARM:
-			if !arch.ARMConditionCodes(prog, cond) {
-				p.errorf("unrecognized condition code .%q", cond)
-				return
-			}
+		// case sys.ARM:
+		// 	if !arch.ARMConditionCodes(prog, cond) {
+		// 		p.errorf("unrecognized condition code .%q", cond)
+		// 		return
+		// 	}
 
-		case sys.ARM64:
-			if !arch.ARM64Suffix(prog, cond) {
-				p.errorf("unrecognized suffix .%q", cond)
-				return
-			}
+		// case sys.ARM64:
+		// 	if !arch.ARM64Suffix(prog, cond) {
+		// 		p.errorf("unrecognized suffix .%q", cond)
+		// 		return
+		// 	}
 
-		case sys.AMD64, sys.I386:
+			// case sys.AMD64, sys.I386:
+		case sys.AMD64:
 			if err := x86.ParseSuffix(prog, cond); err != nil {
 				p.errorf("%v", err)
 				return
@@ -405,113 +406,113 @@ func (p *Parser) asmJump(op obj.As, cond string, a []obj.Addr) {
 		return
 	case 1:
 		target = &a[0]
-	case 2:
-		// Special 2-operand jumps.
-		if p.arch.Family == sys.ARM64 && arch.IsARM64ADR(op) {
-			// ADR label, R. Label is in From.
-			target = &a[0]
-			prog.To = a[1]
-			targetAddr = &prog.From
-		} else {
-			target = &a[1]
-			prog.From = a[0]
-		}
+	// case 2:
+	// 	// Special 2-operand jumps.
+	// 	if p.arch.Family == sys.ARM64 && arch.IsARM64ADR(op) {
+	// 		// ADR label, R. Label is in From.
+	// 		target = &a[0]
+	// 		prog.To = a[1]
+	// 		targetAddr = &prog.From
+	// 	} else {
+	// 		target = &a[1]
+	// 		prog.From = a[0]
+	// 	}
 	case 3:
-		if p.arch.Family == sys.PPC64 {
-			// Special 3-operand jumps.
-			// a[1] is a register number expressed as a constant or register value
-			target = &a[2]
-			prog.From = a[0]
-			if a[0].Type != obj.TYPE_CONST {
-				// Legacy code may use a plain constant, accept it, and coerce
-				// into a constant. E.g:
-				//   BC 4,...
-				// into
-				//   BC $4,...
-				prog.From = obj.Addr{
-					Type:   obj.TYPE_CONST,
-					Offset: p.getConstant(prog, op, &a[0]),
-				}
+		// if p.arch.Family == sys.PPC64 {
+		// 	// Special 3-operand jumps.
+		// 	// a[1] is a register number expressed as a constant or register value
+		// 	target = &a[2]
+		// 	prog.From = a[0]
+		// 	if a[0].Type != obj.TYPE_CONST {
+		// 		// Legacy code may use a plain constant, accept it, and coerce
+		// 		// into a constant. E.g:
+		// 		//   BC 4,...
+		// 		// into
+		// 		//   BC $4,...
+		// 		prog.From = obj.Addr{
+		// 			Type:   obj.TYPE_CONST,
+		// 			Offset: p.getConstant(prog, op, &a[0]),
+		// 		}
 
-			}
+		// 	}
 
-			// Likewise, fixup usage like:
-			//   BC x,LT,...
-			//   BC x,foo+2,...
-			//   BC x,4
-			//   BC x,$5
-			// into
-			//   BC x,CR0LT,...
-			//   BC x,CR0EQ,...
-			//   BC x,CR1LT,...
-			//   BC x,CR1GT,...
-			// The first and second case demonstrate a symbol name which is
-			// effectively discarded. In these cases, the offset determines
-			// the CR bit.
-			prog.Reg = a[1].Reg
-			if a[1].Type != obj.TYPE_REG {
-				// The CR bit is represented as a constant 0-31. Convert it to a Reg.
-				c := p.getConstant(prog, op, &a[1])
-				reg, success := ppc64.ConstantToCRbit(c)
-				if !success {
-					p.errorf("invalid CR bit register number %d", c)
-				}
-				prog.Reg = reg
-			}
-			break
-		}
-		if p.arch.Family == sys.MIPS || p.arch.Family == sys.MIPS64 || p.arch.Family == sys.RISCV64 {
-			// 3-operand jumps.
-			// First two must be registers
-			target = &a[2]
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			break
-		}
-		if p.arch.Family == sys.Loong64 {
-			// 3-operand jumps.
-			// First two must be registers
-			target = &a[2]
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			break
-		}
-		if p.arch.Family == sys.S390X {
-			// 3-operand jumps.
-			target = &a[2]
-			prog.From = a[0]
-			if a[1].Reg != 0 {
-				// Compare two registers and jump.
-				prog.Reg = p.getRegister(prog, op, &a[1])
-			} else {
-				// Compare register with immediate and jump.
-				prog.SetFrom3(a[1])
-			}
-			break
-		}
-		if p.arch.Family == sys.ARM64 {
-			// Special 3-operand jumps.
-			// a[0] must be immediate constant; a[1] is a register.
-			if a[0].Type != obj.TYPE_CONST {
-				p.errorf("%s: expected immediate constant; found %s", op, obj.Dconv(prog, &a[0]))
-				return
-			}
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			target = &a[2]
-			break
-		}
+		// 	// Likewise, fixup usage like:
+		// 	//   BC x,LT,...
+		// 	//   BC x,foo+2,...
+		// 	//   BC x,4
+		// 	//   BC x,$5
+		// 	// into
+		// 	//   BC x,CR0LT,...
+		// 	//   BC x,CR0EQ,...
+		// 	//   BC x,CR1LT,...
+		// 	//   BC x,CR1GT,...
+		// 	// The first and second case demonstrate a symbol name which is
+		// 	// effectively discarded. In these cases, the offset determines
+		// 	// the CR bit.
+		// 	prog.Reg = a[1].Reg
+		// 	if a[1].Type != obj.TYPE_REG {
+		// 		// The CR bit is represented as a constant 0-31. Convert it to a Reg.
+		// 		c := p.getConstant(prog, op, &a[1])
+		// 		reg, success := ppc64.ConstantToCRbit(c)
+		// 		if !success {
+		// 			p.errorf("invalid CR bit register number %d", c)
+		// 		}
+		// 		prog.Reg = reg
+		// 	}
+		// 	break
+		// }
+		// if p.arch.Family == sys.MIPS || p.arch.Family == sys.MIPS64 || p.arch.Family == sys.RISCV64 {
+		// 	// 3-operand jumps.
+		// 	// First two must be registers
+		// 	target = &a[2]
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	break
+		// }
+		// if p.arch.Family == sys.Loong64 {
+		// 	// 3-operand jumps.
+		// 	// First two must be registers
+		// 	target = &a[2]
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	break
+		// }
+		// if p.arch.Family == sys.S390X {
+		// 	// 3-operand jumps.
+		// 	target = &a[2]
+		// 	prog.From = a[0]
+		// 	if a[1].Reg != 0 {
+		// 		// Compare two registers and jump.
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	} else {
+		// 		// Compare register with immediate and jump.
+		// 		prog.SetFrom3(a[1])
+		// 	}
+		// 	break
+		// }
+		// if p.arch.Family == sys.ARM64 {
+		// 	// Special 3-operand jumps.
+		// 	// a[0] must be immediate constant; a[1] is a register.
+		// 	if a[0].Type != obj.TYPE_CONST {
+		// 		p.errorf("%s: expected immediate constant; found %s", op, obj.Dconv(prog, &a[0]))
+		// 		return
+		// 	}
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	target = &a[2]
+		// 	break
+		// }
 		p.errorf("wrong number of arguments to %s instruction", op)
 		return
 	case 4:
-		if p.arch.Family == sys.S390X || p.arch.Family == sys.PPC64 {
-			// 4-operand compare-and-branch.
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.SetFrom3(a[2])
-			target = &a[3]
-			break
-		}
+		// if p.arch.Family == sys.S390X || p.arch.Family == sys.PPC64 {
+		// 	// 4-operand compare-and-branch.
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.SetFrom3(a[2])
+		// 	target = &a[3]
+		// 	break
+		// }
 		p.errorf("wrong number of arguments to %s instruction", op)
 		return
 	default:
@@ -607,299 +608,299 @@ func (p *Parser) asmInstruction(op obj.As, cond string, a []obj.Addr) {
 			prog.From = a[0]
 			// prog.To is no address.
 		}
-		if p.arch.Family == sys.PPC64 && arch.IsPPC64NEG(op) {
-			// NEG: From and To are both a[0].
-			prog.To = a[0]
-			prog.From = a[0]
-			break
-		}
+		// if p.arch.Family == sys.PPC64 && arch.IsPPC64NEG(op) {
+		// 	// NEG: From and To are both a[0].
+		// 	prog.To = a[0]
+		// 	prog.From = a[0]
+		// 	break
+		// }
 	case 2:
-		if p.arch.Family == sys.ARM {
-			if arch.IsARMCMP(op) {
-				prog.From = a[0]
-				prog.Reg = p.getRegister(prog, op, &a[1])
-				break
-			}
-			// Strange special cases.
-			if arch.IsARMFloatCmp(op) {
-				prog.From = a[0]
-				prog.Reg = p.getRegister(prog, op, &a[1])
-				break
-			}
-		} else if p.arch.Family == sys.ARM64 && arch.IsARM64CMP(op) {
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			break
-		} else if p.arch.Family == sys.MIPS || p.arch.Family == sys.MIPS64 {
-			if arch.IsMIPSCMP(op) || arch.IsMIPSMUL(op) {
-				prog.From = a[0]
-				prog.Reg = p.getRegister(prog, op, &a[1])
-				break
-			}
-		} else if p.arch.Family == sys.Loong64 {
-			if arch.IsLoong64CMP(op) {
-				prog.From = a[0]
-				prog.Reg = p.getRegister(prog, op, &a[1])
-				break
-			}
+		// if p.arch.Family == sys.ARM {
+		// 	if arch.IsARMCMP(op) {
+		// 		prog.From = a[0]
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 		break
+		// 	}
+		// 	// Strange special cases.
+		// 	if arch.IsARMFloatCmp(op) {
+		// 		prog.From = a[0]
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 		break
+		// 	}
+		// } else if p.arch.Family == sys.ARM64 && arch.IsARM64CMP(op) {
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	break
+		// } else if p.arch.Family == sys.MIPS || p.arch.Family == sys.MIPS64 {
+		// 	if arch.IsMIPSCMP(op) || arch.IsMIPSMUL(op) {
+		// 		prog.From = a[0]
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 		break
+		// 	}
+		// } else if p.arch.Family == sys.Loong64 {
+		// 	if arch.IsLoong64CMP(op) {
+		// 		prog.From = a[0]
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 		break
+		// 	}
 
-			if arch.IsLoong64RDTIME(op) {
-				// The Loong64 RDTIME family of instructions is a bit special,
-				// in that both its register operands are outputs
-				prog.To = a[0]
-				if a[1].Type != obj.TYPE_REG {
-					p.errorf("invalid addressing modes for 2nd operand to %s instruction, must be register", op)
-					return
-				}
-				prog.RegTo2 = a[1].Reg
-				break
-			}
-		}
+		// 	if arch.IsLoong64RDTIME(op) {
+		// 		// The Loong64 RDTIME family of instructions is a bit special,
+		// 		// in that both its register operands are outputs
+		// 		prog.To = a[0]
+		// 		if a[1].Type != obj.TYPE_REG {
+		// 			p.errorf("invalid addressing modes for 2nd operand to %s instruction, must be register", op)
+		// 			return
+		// 		}
+		// 		prog.RegTo2 = a[1].Reg
+		// 		break
+		// 	}
+		// }
 		prog.From = a[0]
 		prog.To = a[1]
 	case 3:
 		switch p.arch.Family {
-		case sys.MIPS, sys.MIPS64:
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.To = a[2]
-		case sys.Loong64:
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.To = a[2]
-		case sys.ARM:
-			// Special cases.
-			if arch.IsARMSTREX(op) {
-				/*
-					STREX x, (y), z
-						from=(y) reg=x to=z
-				*/
-				prog.From = a[1]
-				prog.Reg = p.getRegister(prog, op, &a[0])
-				prog.To = a[2]
-				break
-			}
-			if arch.IsARMBFX(op) {
-				// a[0] and a[1] must be constants, a[2] must be a register
-				prog.From = a[0]
-				prog.SetFrom3(a[1])
-				prog.To = a[2]
-				break
-			}
-			// Otherwise the 2nd operand (a[1]) must be a register.
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.To = a[2]
+		// case sys.MIPS, sys.MIPS64:
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.To = a[2]
+		// case sys.Loong64:
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.To = a[2]
+		// case sys.ARM:
+		// 	// Special cases.
+		// 	if arch.IsARMSTREX(op) {
+		// 		/*
+		// 			STREX x, (y), z
+		// 				from=(y) reg=x to=z
+		// 		*/
+		// 		prog.From = a[1]
+		// 		prog.Reg = p.getRegister(prog, op, &a[0])
+		// 		prog.To = a[2]
+		// 		break
+		// 	}
+		// 	if arch.IsARMBFX(op) {
+		// 		// a[0] and a[1] must be constants, a[2] must be a register
+		// 		prog.From = a[0]
+		// 		prog.SetFrom3(a[1])
+		// 		prog.To = a[2]
+		// 		break
+		// 	}
+		// 	// Otherwise the 2nd operand (a[1]) must be a register.
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.To = a[2]
 		case sys.AMD64:
 			prog.From = a[0]
 			prog.SetFrom3(a[1])
 			prog.To = a[2]
-		case sys.ARM64:
-			switch {
-			case arch.IsARM64STLXR(op):
-				// ARM64 instructions with one input and two outputs.
-				prog.From = a[0]
-				prog.To = a[1]
-				if a[2].Type != obj.TYPE_REG {
-					p.errorf("invalid addressing modes for third operand to %s instruction, must be register", op)
-					return
-				}
-				prog.RegTo2 = a[2].Reg
-			case arch.IsARM64TBL(op):
-				// one of its inputs does not fit into prog.Reg.
-				prog.From = a[0]
-				prog.SetFrom3(a[1])
-				prog.To = a[2]
-			case arch.IsARM64CASP(op):
-				prog.From = a[0]
-				prog.To = a[1]
-				// both 1st operand and 3rd operand are (Rs, Rs+1) register pair.
-				// And the register pair must be contiguous.
-				if (a[0].Type != obj.TYPE_REGREG) || (a[2].Type != obj.TYPE_REGREG) {
-					p.errorf("invalid addressing modes for 1st or 3rd operand to %s instruction, must be register pair", op)
-					return
-				}
-				// For ARM64 CASP-like instructions, its 2nd destination operand is register pair(Rt, Rt+1) that can
-				// not fit into prog.RegTo2, so save it to the prog.RestArgs.
-				prog.SetTo2(a[2])
-			default:
-				prog.From = a[0]
-				prog.Reg = p.getRegister(prog, op, &a[1])
-				prog.To = a[2]
-			}
+		// case sys.ARM64:
+		// 	switch {
+		// 	case arch.IsARM64STLXR(op):
+		// 		// ARM64 instructions with one input and two outputs.
+		// 		prog.From = a[0]
+		// 		prog.To = a[1]
+		// 		if a[2].Type != obj.TYPE_REG {
+		// 			p.errorf("invalid addressing modes for third operand to %s instruction, must be register", op)
+		// 			return
+		// 		}
+		// 		prog.RegTo2 = a[2].Reg
+		// 	case arch.IsARM64TBL(op):
+		// 		// one of its inputs does not fit into prog.Reg.
+		// 		prog.From = a[0]
+		// 		prog.SetFrom3(a[1])
+		// 		prog.To = a[2]
+		// 	case arch.IsARM64CASP(op):
+		// 		prog.From = a[0]
+		// 		prog.To = a[1]
+		// 		// both 1st operand and 3rd operand are (Rs, Rs+1) register pair.
+		// 		// And the register pair must be contiguous.
+		// 		if (a[0].Type != obj.TYPE_REGREG) || (a[2].Type != obj.TYPE_REGREG) {
+		// 			p.errorf("invalid addressing modes for 1st or 3rd operand to %s instruction, must be register pair", op)
+		// 			return
+		// 		}
+		// 		// For ARM64 CASP-like instructions, its 2nd destination operand is register pair(Rt, Rt+1) that can
+		// 		// not fit into prog.RegTo2, so save it to the prog.RestArgs.
+		// 		prog.SetTo2(a[2])
+		// 	default:
+		// 		prog.From = a[0]
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 		prog.To = a[2]
+		// 	}
 		case sys.I386:
 			prog.From = a[0]
 			prog.SetFrom3(a[1])
 			prog.To = a[2]
-		case sys.PPC64:
-			if arch.IsPPC64CMP(op) {
-				// CMPW etc.; third argument is a CR register that goes into prog.Reg.
-				prog.From = a[0]
-				prog.Reg = p.getRegister(prog, op, &a[2])
-				prog.To = a[1]
-				break
-			}
+		// case sys.PPC64:
+		// 	if arch.IsPPC64CMP(op) {
+		// 		// CMPW etc.; third argument is a CR register that goes into prog.Reg.
+		// 		prog.From = a[0]
+		// 		prog.Reg = p.getRegister(prog, op, &a[2])
+		// 		prog.To = a[1]
+		// 		break
+		// 	}
 
-			prog.From = a[0]
-			prog.To = a[2]
+		// 	prog.From = a[0]
+		// 	prog.To = a[2]
 
-			// If the second argument is not a register argument, it must be
-			// passed RestArgs/SetFrom3
-			switch a[1].Type {
-			case obj.TYPE_REG:
-				prog.Reg = p.getRegister(prog, op, &a[1])
-			default:
-				prog.SetFrom3(a[1])
-			}
-		case sys.RISCV64:
-			// RISCV64 instructions with one input and two outputs.
-			if arch.IsRISCV64AMO(op) {
-				prog.From = a[0]
-				prog.To = a[1]
-				if a[2].Type != obj.TYPE_REG {
-					p.errorf("invalid addressing modes for third operand to %s instruction, must be register", op)
-					return
-				}
-				prog.RegTo2 = a[2].Reg
-				break
-			}
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.To = a[2]
-		case sys.S390X:
-			prog.From = a[0]
-			if a[1].Type == obj.TYPE_REG {
-				prog.Reg = p.getRegister(prog, op, &a[1])
-			} else {
-				prog.SetFrom3(a[1])
-			}
-			prog.To = a[2]
+		// 	// If the second argument is not a register argument, it must be
+		// 	// passed RestArgs/SetFrom3
+		// 	switch a[1].Type {
+		// 	case obj.TYPE_REG:
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	default:
+		// 		prog.SetFrom3(a[1])
+		// 	}
+		// case sys.RISCV64:
+		// 	// RISCV64 instructions with one input and two outputs.
+		// 	if arch.IsRISCV64AMO(op) {
+		// 		prog.From = a[0]
+		// 		prog.To = a[1]
+		// 		if a[2].Type != obj.TYPE_REG {
+		// 			p.errorf("invalid addressing modes for third operand to %s instruction, must be register", op)
+		// 			return
+		// 		}
+		// 		prog.RegTo2 = a[2].Reg
+		// 		break
+		// 	}
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.To = a[2]
+		// case sys.S390X:
+		// 	prog.From = a[0]
+		// 	if a[1].Type == obj.TYPE_REG {
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	} else {
+		// 		prog.SetFrom3(a[1])
+		// 	}
+		// 	prog.To = a[2]
 		default:
 			p.errorf("TODO: implement three-operand instructions for this architecture")
 			return
 		}
 	case 4:
-		if p.arch.Family == sys.ARM {
-			if arch.IsARMBFX(op) {
-				// a[0] and a[1] must be constants, a[2] and a[3] must be registers
-				prog.From = a[0]
-				prog.SetFrom3(a[1])
-				prog.Reg = p.getRegister(prog, op, &a[2])
-				prog.To = a[3]
-				break
-			}
-			if arch.IsARMMULA(op) {
-				// All must be registers.
-				p.getRegister(prog, op, &a[0])
-				r1 := p.getRegister(prog, op, &a[1])
-				r2 := p.getRegister(prog, op, &a[2])
-				p.getRegister(prog, op, &a[3])
-				prog.From = a[0]
-				prog.To = a[3]
-				prog.To.Type = obj.TYPE_REGREG2
-				prog.To.Offset = int64(r2)
-				prog.Reg = r1
-				break
-			}
-		}
+		// if p.arch.Family == sys.ARM {
+		// 	if arch.IsARMBFX(op) {
+		// 		// a[0] and a[1] must be constants, a[2] and a[3] must be registers
+		// 		prog.From = a[0]
+		// 		prog.SetFrom3(a[1])
+		// 		prog.Reg = p.getRegister(prog, op, &a[2])
+		// 		prog.To = a[3]
+		// 		break
+		// 	}
+		// 	if arch.IsARMMULA(op) {
+		// 		// All must be registers.
+		// 		p.getRegister(prog, op, &a[0])
+		// 		r1 := p.getRegister(prog, op, &a[1])
+		// 		r2 := p.getRegister(prog, op, &a[2])
+		// 		p.getRegister(prog, op, &a[3])
+		// 		prog.From = a[0]
+		// 		prog.To = a[3]
+		// 		prog.To.Type = obj.TYPE_REGREG2
+		// 		prog.To.Offset = int64(r2)
+		// 		prog.Reg = r1
+		// 		break
+		// 	}
+		// }
 		if p.arch.Family == sys.AMD64 {
 			prog.From = a[0]
 			prog.SetRestArgs([]obj.Addr{a[1], a[2]})
 			prog.To = a[3]
 			break
 		}
-		if p.arch.Family == sys.ARM64 {
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.SetFrom3(a[2])
-			prog.To = a[3]
-			break
-		}
-		if p.arch.Family == sys.PPC64 {
-			prog.From = a[0]
-			prog.To = a[3]
-			// If the second argument is not a register argument, it must be
-			// passed RestArgs/SetFrom3
-			if a[1].Type == obj.TYPE_REG {
-				prog.Reg = p.getRegister(prog, op, &a[1])
-				prog.SetRestArgs([]obj.Addr{a[2]})
-			} else {
-				// Don't set prog.Reg if a1 isn't a reg arg.
-				prog.SetRestArgs([]obj.Addr{a[1], a[2]})
-			}
-			break
-		}
-		if p.arch.Family == sys.RISCV64 {
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.SetRestArgs([]obj.Addr{a[2]})
-			prog.To = a[3]
-			break
-		}
-		if p.arch.Family == sys.S390X {
-			if a[1].Type != obj.TYPE_REG {
-				p.errorf("second operand must be a register in %s instruction", op)
-				return
-			}
-			prog.From = a[0]
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.SetFrom3(a[2])
-			prog.To = a[3]
-			break
-		}
+		// if p.arch.Family == sys.ARM64 {
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.SetFrom3(a[2])
+		// 	prog.To = a[3]
+		// 	break
+		// }
+		// if p.arch.Family == sys.PPC64 {
+		// 	prog.From = a[0]
+		// 	prog.To = a[3]
+		// 	// If the second argument is not a register argument, it must be
+		// 	// passed RestArgs/SetFrom3
+		// 	if a[1].Type == obj.TYPE_REG {
+		// 		prog.Reg = p.getRegister(prog, op, &a[1])
+		// 		prog.SetRestArgs([]obj.Addr{a[2]})
+		// 	} else {
+		// 		// Don't set prog.Reg if a1 isn't a reg arg.
+		// 		prog.SetRestArgs([]obj.Addr{a[1], a[2]})
+		// 	}
+		// 	break
+		// }
+		// if p.arch.Family == sys.RISCV64 {
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.SetRestArgs([]obj.Addr{a[2]})
+		// 	prog.To = a[3]
+		// 	break
+		// }
+		// if p.arch.Family == sys.S390X {
+		// 	if a[1].Type != obj.TYPE_REG {
+		// 		p.errorf("second operand must be a register in %s instruction", op)
+		// 		return
+		// 	}
+		// 	prog.From = a[0]
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.SetFrom3(a[2])
+		// 	prog.To = a[3]
+		// 	break
+		// }
 		p.errorf("can't handle %s instruction with 4 operands", op)
 		return
 	case 5:
-		if p.arch.Family == sys.PPC64 {
-			prog.From = a[0]
-			// Second arg is always a register type on ppc64.
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.SetRestArgs([]obj.Addr{a[2], a[3]})
-			prog.To = a[4]
-			break
-		}
+		// if p.arch.Family == sys.PPC64 {
+		// 	prog.From = a[0]
+		// 	// Second arg is always a register type on ppc64.
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.SetRestArgs([]obj.Addr{a[2], a[3]})
+		// 	prog.To = a[4]
+		// 	break
+		// }
 		if p.arch.Family == sys.AMD64 {
 			prog.From = a[0]
 			prog.SetRestArgs([]obj.Addr{a[1], a[2], a[3]})
 			prog.To = a[4]
 			break
 		}
-		if p.arch.Family == sys.S390X {
-			prog.From = a[0]
-			prog.SetRestArgs([]obj.Addr{a[1], a[2], a[3]})
-			prog.To = a[4]
-			break
-		}
+		// if p.arch.Family == sys.S390X {
+		// 	prog.From = a[0]
+		// 	prog.SetRestArgs([]obj.Addr{a[1], a[2], a[3]})
+		// 	prog.To = a[4]
+		// 	break
+		// }
 		p.errorf("can't handle %s instruction with 5 operands", op)
 		return
 	case 6:
-		if p.arch.Family == sys.ARM && arch.IsARMMRC(op) {
-			// Strange special case: MCR, MRC.
-			prog.To.Type = obj.TYPE_CONST
-			x0 := p.getConstant(prog, op, &a[0])
-			x1 := p.getConstant(prog, op, &a[1])
-			x2 := int64(p.getRegister(prog, op, &a[2]))
-			x3 := int64(p.getRegister(prog, op, &a[3]))
-			x4 := int64(p.getRegister(prog, op, &a[4]))
-			x5 := p.getConstant(prog, op, &a[5])
-			// Cond is handled specially for this instruction.
-			offset, MRC, ok := arch.ARMMRCOffset(op, cond, x0, x1, x2, x3, x4, x5)
-			if !ok {
-				p.errorf("unrecognized condition code .%q", cond)
-			}
-			prog.To.Offset = offset
-			cond = ""
-			prog.As = MRC // Both instructions are coded as MRC.
-			break
-		}
-		if p.arch.Family == sys.PPC64 {
-			prog.From = a[0]
-			// Second arg is always a register type on ppc64.
-			prog.Reg = p.getRegister(prog, op, &a[1])
-			prog.SetRestArgs([]obj.Addr{a[2], a[3], a[4]})
-			prog.To = a[5]
-			break
-		}
+		// if p.arch.Family == sys.ARM && arch.IsARMMRC(op) {
+		// 	// Strange special case: MCR, MRC.
+		// 	prog.To.Type = obj.TYPE_CONST
+		// 	x0 := p.getConstant(prog, op, &a[0])
+		// 	x1 := p.getConstant(prog, op, &a[1])
+		// 	x2 := int64(p.getRegister(prog, op, &a[2]))
+		// 	x3 := int64(p.getRegister(prog, op, &a[3]))
+		// 	x4 := int64(p.getRegister(prog, op, &a[4]))
+		// 	x5 := p.getConstant(prog, op, &a[5])
+		// 	// Cond is handled specially for this instruction.
+		// 	offset, MRC, ok := arch.ARMMRCOffset(op, cond, x0, x1, x2, x3, x4, x5)
+		// 	if !ok {
+		// 		p.errorf("unrecognized condition code .%q", cond)
+		// 	}
+		// 	prog.To.Offset = offset
+		// 	cond = ""
+		// 	prog.As = MRC // Both instructions are coded as MRC.
+		// 	break
+		// }
+		// if p.arch.Family == sys.PPC64 {
+		// 	prog.From = a[0]
+		// 	// Second arg is always a register type on ppc64.
+		// 	prog.Reg = p.getRegister(prog, op, &a[1])
+		// 	prog.SetRestArgs([]obj.Addr{a[2], a[3], a[4]})
+		// 	prog.To = a[5]
+		// 	break
+		// }
 		fallthrough
 	default:
 		p.errorf("can't handle %s instruction with %d operands", op, len(a))

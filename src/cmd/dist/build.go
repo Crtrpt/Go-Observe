@@ -837,8 +837,8 @@ func runInstall(pkg string, ch chan struct{}) {
 			pathf("%s/src/runtime/textflag.h", goroot), 0)
 		copyfile(pathf("%s/pkg/include/funcdata.h", goroot),
 			pathf("%s/src/runtime/funcdata.h", goroot), 0)
-		copyfile(pathf("%s/pkg/include/asm_ppc64x.h", goroot),
-			pathf("%s/src/runtime/asm_ppc64x.h", goroot), 0)
+		// copyfile(pathf("%s/pkg/include/asm_ppc64x.h", goroot),
+		// 	pathf("%s/src/runtime/asm_ppc64x.h", goroot), 0)
 		copyfile(pathf("%s/pkg/include/asm_amd64.h", goroot),
 			pathf("%s/src/runtime/asm_amd64.h", goroot), 0)
 	}

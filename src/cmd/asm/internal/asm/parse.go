@@ -19,7 +19,7 @@ import (
 	"cmd/asm/internal/flags"
 	"cmd/asm/internal/lex"
 	"cmd/internal/obj"
-	"cmd/internal/obj/arm64"
+	// "cmd/internal/obj/arm64"
 	"cmd/internal/obj/x86"
 	"cmd/internal/src"
 	"cmd/internal/sys"
@@ -391,14 +391,14 @@ func (p *Parser) operand(a *obj.Addr) {
 	name := tok.String()
 	if tok.ScanToken == scanner.Ident && !p.atStartOfRegister(name) {
 		switch p.arch.Family {
-		case sys.ARM64:
-			// arm64 special operands.
-			if opd := arch.GetARM64SpecialOperand(name); opd != arm64.SPOP_END {
-				a.Type = obj.TYPE_SPECIAL
-				a.Offset = int64(opd)
-				break
-			}
-			fallthrough
+		// case sys.ARM64:
+		// 	// arm64 special operands.
+		// 	if opd := arch.GetARM64SpecialOperand(name); opd != arm64.SPOP_END {
+		// 		a.Type = obj.TYPE_SPECIAL
+		// 		a.Offset = int64(opd)
+		// 		break
+		// 	}
+		// 	fallthrough
 		default:
 			// We have a symbol. Parse $sym±offset(symkind)
 			p.symbolReference(a, name, prefix)
@@ -697,15 +697,16 @@ func (p *Parser) registerShift(name string, prefix rune) int64 {
 	default:
 		p.errorf("unexpected %s in register shift", tok.String())
 	}
-	if p.arch.Family == sys.ARM64 {
-		off, err := arch.ARM64RegisterShift(r1, op, count)
-		if err != nil {
-			p.errorf(err.Error())
-		}
-		return off
-	} else {
-		return int64((r1 & 15) | op<<5 | count)
-	}
+	// if p.arch.Family == sys.ARM64 {
+	// 	off, err := arch.ARM64RegisterShift(r1, op, count)
+	// 	if err != nil {
+	// 		p.errorf(err.Error())
+	// 	}
+	// 	return off
+	// } else {
+	// 	return int64((r1 & 15) | op<<5 | count)
+	// }
+	return int64((r1 & 15) | op<<5 | count)
 }
 
 // registerExtension parses a register with extension or arrangement.
@@ -715,55 +716,55 @@ func (p *Parser) registerExtension(a *obj.Addr, name string, prefix rune) {
 		p.errorf("prefix %c not allowed for shifted register: $%s", prefix, name)
 	}
 
-	reg, ok := p.registerReference(name)
-	if !ok {
-		p.errorf("unexpected %s in register extension", name)
-		return
-	}
+	// reg, ok := p.registerReference(name)
+	// if !ok {
+	// 	p.errorf("unexpected %s in register extension", name)
+	// 	return
+	// }
 
-	isIndex := false
-	num := int16(0)
-	isAmount := true // Amount is zero by default
-	ext := ""
-	if p.peek() == lex.LSH {
-		// (Rn)(Rm<<2), the shifted offset register.
-		ext = "LSL"
-	} else {
-		// (Rn)(Rm.UXTW<1), the extended offset register.
-		// Rm.UXTW<<3, the extended register.
-		p.get('.')
-		tok := p.next()
-		ext = tok.String()
-	}
-	if p.peek() == lex.LSH {
-		// parses left shift amount applied after extension: <<Amount
-		p.get(lex.LSH)
-		tok := p.get(scanner.Int)
-		amount, err := strconv.ParseInt(tok.String(), 10, 16)
-		if err != nil {
-			p.errorf("parsing left shift amount: %s", err)
-		}
-		num = int16(amount)
-	} else if p.peek() == '[' {
-		// parses an element: [Index]
-		p.get('[')
-		tok := p.get(scanner.Int)
-		index, err := strconv.ParseInt(tok.String(), 10, 16)
-		p.get(']')
-		if err != nil {
-			p.errorf("parsing element index: %s", err)
-		}
-		isIndex = true
-		isAmount = false
-		num = int16(index)
-	}
+	// isIndex := false
+	// num := int16(0)
+	// isAmount := true // Amount is zero by default
+	// ext := ""
+	// if p.peek() == lex.LSH {
+	// 	// (Rn)(Rm<<2), the shifted offset register.
+	// 	// ext = "LSL"
+	// } else {
+	// 	// (Rn)(Rm.UXTW<1), the extended offset register.
+	// 	// Rm.UXTW<<3, the extended register.
+	// 	p.get('.')
+	// 	tok := p.next()
+	// 	// ext = tok.String()
+	// }
+	// if p.peek() == lex.LSH {
+	// 	// parses left shift amount applied after extension: <<Amount
+	// 	p.get(lex.LSH)
+	// 	tok := p.get(scanner.Int)
+	// 	amount, err := strconv.ParseInt(tok.String(), 10, 16)
+	// 	if err != nil {
+	// 		p.errorf("parsing left shift amount: %s", err)
+	// 	}
+	// 	num = int16(amount)
+	// } else if p.peek() == '[' {
+	// 	// parses an element: [Index]
+	// 	p.get('[')
+	// 	tok := p.get(scanner.Int)
+	// 	index, err := strconv.ParseInt(tok.String(), 10, 16)
+	// 	p.get(']')
+	// 	if err != nil {
+	// 		p.errorf("parsing element index: %s", err)
+	// 	}
+	// 	isIndex = true
+	// 	isAmount = false
+	// 	num = int16(index)
+	// }
 
 	switch p.arch.Family {
-	case sys.ARM64:
-		err := arch.ARM64RegisterExtension(a, ext, reg, num, isAmount, isIndex)
-		if err != nil {
-			p.errorf(err.Error())
-		}
+	// case sys.ARM64:
+	// 	err := arch.ARM64RegisterExtension(a, ext, reg, num, isAmount, isIndex)
+	// 	if err != nil {
+	// 		p.errorf(err.Error())
+	// 	}
 	default:
 		p.errorf("register extension not supported on this architecture")
 	}
@@ -1054,104 +1055,104 @@ func (p *Parser) registerList(a *obj.Addr) {
 	if p.arch.InFamily(sys.I386, sys.AMD64) {
 		p.registerListX86(a)
 	} else {
-		p.registerListARM(a)
+		// p.registerListARM(a)
 	}
 }
 
-func (p *Parser) registerListARM(a *obj.Addr) {
-	// One range per loop.
-	var maxReg int
-	var bits uint16
-	var arrangement int64
-	switch p.arch.Family {
-	case sys.ARM:
-		maxReg = 16
-	case sys.ARM64:
-		maxReg = 32
-	default:
-		p.errorf("unexpected register list")
-	}
-	firstReg := -1
-	nextReg := -1
-	regCnt := 0
-ListLoop:
-	for {
-		tok := p.next()
-		switch tok.ScanToken {
-		case ']':
-			break ListLoop
-		case scanner.EOF:
-			p.errorf("missing ']' in register list")
-			return
-		}
-		switch p.arch.Family {
-		case sys.ARM64:
-			// Vn.T
-			name := tok.String()
-			r, ok := p.registerReference(name)
-			if !ok {
-				p.errorf("invalid register: %s", name)
-			}
-			reg := r - p.arch.Register["V0"]
-			p.get('.')
-			tok := p.next()
-			ext := tok.String()
-			curArrangement, err := arch.ARM64RegisterArrangement(reg, name, ext)
-			if err != nil {
-				p.errorf(err.Error())
-			}
-			if firstReg == -1 {
-				// only record the first register and arrangement
-				firstReg = int(reg)
-				nextReg = firstReg
-				arrangement = curArrangement
-			} else if curArrangement != arrangement {
-				p.errorf("inconsistent arrangement in ARM64 register list")
-			} else if nextReg != int(reg) {
-				p.errorf("incontiguous register in ARM64 register list: %s", name)
-			}
-			regCnt++
-			nextReg = (nextReg + 1) % 32
-		case sys.ARM:
-			// Parse the upper and lower bounds.
-			lo := p.registerNumber(tok.String())
-			hi := lo
-			if p.peek() == '-' {
-				p.next()
-				hi = p.registerNumber(p.next().String())
-			}
-			if hi < lo {
-				lo, hi = hi, lo
-			}
-			// Check there are no duplicates in the register list.
-			for i := 0; lo <= hi && i < maxReg; i++ {
-				if bits&(1<<lo) != 0 {
-					p.errorf("register R%d already in list", lo)
-				}
-				bits |= 1 << lo
-				lo++
-			}
-		default:
-			p.errorf("unexpected register list")
-		}
-		if p.peek() != ']' {
-			p.get(',')
-		}
-	}
-	a.Type = obj.TYPE_REGLIST
-	switch p.arch.Family {
-	case sys.ARM:
-		a.Offset = int64(bits)
-	case sys.ARM64:
-		offset, err := arch.ARM64RegisterListOffset(firstReg, regCnt, arrangement)
-		if err != nil {
-			p.errorf(err.Error())
-		}
-		a.Offset = offset
-	default:
-		p.errorf("register list not supported on this architecuture")
-	}
-}
+// func (p *Parser) registerListARM(a *obj.Addr) {
+// 	// One range per loop.
+// 	var maxReg int
+// 	var bits uint16
+// 	var arrangement int64
+// 	switch p.arch.Family {
+// 	case sys.ARM:
+// 		maxReg = 16
+// 	case sys.ARM64:
+// 		maxReg = 32
+// 	default:
+// 		p.errorf("unexpected register list")
+// 	}
+// 	firstReg := -1
+// 	nextReg := -1
+// 	regCnt := 0
+// ListLoop:
+// 	for {
+// 		tok := p.next()
+// 		switch tok.ScanToken {
+// 		case ']':
+// 			break ListLoop
+// 		case scanner.EOF:
+// 			p.errorf("missing ']' in register list")
+// 			return
+// 		}
+// 		switch p.arch.Family {
+// 		// case sys.ARM64:
+// 		// 	// Vn.T
+// 		// 	name := tok.String()
+// 		// 	r, ok := p.registerReference(name)
+// 		// 	if !ok {
+// 		// 		p.errorf("invalid register: %s", name)
+// 		// 	}
+// 		// 	reg := r - p.arch.Register["V0"]
+// 		// 	p.get('.')
+// 		// 	tok := p.next()
+// 		// 	ext := tok.String()
+// 		// 	curArrangement, err := arch.ARM64RegisterArrangement(reg, name, ext)
+// 		// 	if err != nil {
+// 		// 		p.errorf(err.Error())
+// 		// 	}
+// 		// 	if firstReg == -1 {
+// 		// 		// only record the first register and arrangement
+// 		// 		firstReg = int(reg)
+// 		// 		nextReg = firstReg
+// 		// 		arrangement = curArrangement
+// 		// 	} else if curArrangement != arrangement {
+// 		// 		p.errorf("inconsistent arrangement in ARM64 register list")
+// 		// 	} else if nextReg != int(reg) {
+// 		// 		p.errorf("incontiguous register in ARM64 register list: %s", name)
+// 		// 	}
+// 		// 	regCnt++
+// 		// 	nextReg = (nextReg + 1) % 32
+// 		// case sys.ARM:
+// 		// 	// Parse the upper and lower bounds.
+// 		// 	lo := p.registerNumber(tok.String())
+// 		// 	hi := lo
+// 		// 	if p.peek() == '-' {
+// 		// 		p.next()
+// 		// 		hi = p.registerNumber(p.next().String())
+// 		// 	}
+// 		// 	if hi < lo {
+// 		// 		lo, hi = hi, lo
+// 		// 	}
+// 		// 	// Check there are no duplicates in the register list.
+// 		// 	for i := 0; lo <= hi && i < maxReg; i++ {
+// 		// 		if bits&(1<<lo) != 0 {
+// 		// 			p.errorf("register R%d already in list", lo)
+// 		// 		}
+// 		// 		bits |= 1 << lo
+// 		// 		lo++
+// 		// 	}
+// 		default:
+// 			p.errorf("unexpected register list")
+// 		}
+// 		if p.peek() != ']' {
+// 			p.get(',')
+// 		}
+// 	}
+// 	a.Type = obj.TYPE_REGLIST
+// 	switch p.arch.Family {
+// 	case sys.ARM:
+// 		a.Offset = int64(bits)
+// 	case sys.ARM64:
+// 		offset, err := arch.ARM64RegisterListOffset(firstReg, regCnt, arrangement)
+// 		if err != nil {
+// 			p.errorf(err.Error())
+// 		}
+// 		a.Offset = offset
+// 	default:
+// 		p.errorf("register list not supported on this architecuture")
+// 	}
+// }
 
 func (p *Parser) registerListX86(a *obj.Addr) {
 	// Accept only [RegA-RegB] syntax.

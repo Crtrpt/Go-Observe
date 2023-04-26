@@ -4733,7 +4733,8 @@ func sigprof(pc, sp, lr uintptr, gp *g, mp *m) {
 		// Normal traceback is impossible or has failed.
 		// Account it against abstract "System" or "GC".
 		n = 2
-		if inVDSOPage(pc) {
+		// if inVDSOPage(pc) {
+		if false {
 			pc = abi.FuncPCABIInternal(_VDSO) + sys.PCQuantum
 		} else if pc > firstmoduledata.etext {
 			// "ExternalCode" is better than "etext".

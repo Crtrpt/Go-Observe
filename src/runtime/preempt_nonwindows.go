@@ -6,6 +6,7 @@
 
 package runtime
 
+//如果不是windows平台占位用
 //go:nosplit
 func osPreemptExtEnter(mp *m) {}
 

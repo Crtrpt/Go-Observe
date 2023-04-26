@@ -6,7 +6,7 @@ package ssa
 
 import (
 	"cmd/compile/internal/ir"
-	"cmd/internal/obj/s390x"
+	// "cmd/internal/obj/s390x"
 	"math"
 	"math/bits"
 )
@@ -200,16 +200,16 @@ func checkFunc(f *Func) {
 					f.Fatalf("value %v has an AuxInt value that is a valid opcode", v)
 				}
 				canHaveAuxInt = true
-			case auxS390XCCMask:
-				if _, ok := v.Aux.(s390x.CCMask); !ok {
-					f.Fatalf("bad type %T for S390XCCMask in %v", v.Aux, v)
-				}
-				canHaveAux = true
-			case auxS390XRotateParams:
-				if _, ok := v.Aux.(s390x.RotateParams); !ok {
-					f.Fatalf("bad type %T for S390XRotateParams in %v", v.Aux, v)
-				}
-				canHaveAux = true
+			// case auxS390XCCMask:
+			// 	if _, ok := v.Aux.(s390x.CCMask); !ok {
+			// 		f.Fatalf("bad type %T for S390XCCMask in %v", v.Aux, v)
+			// 	}
+			// 	canHaveAux = true
+			// case auxS390XRotateParams:
+			// 	if _, ok := v.Aux.(s390x.RotateParams); !ok {
+			// 		f.Fatalf("bad type %T for S390XRotateParams in %v", v.Aux, v)
+			// 	}
+			// 	canHaveAux = true
 			case auxFlagConstant:
 				if v.AuxInt < 0 || v.AuxInt > 15 {
 					f.Fatalf("bad FlagConstant AuxInt value for %v", v)

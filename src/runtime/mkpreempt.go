@@ -76,17 +76,17 @@ var regNamesAMD64 = []string{
 var out io.Writer
 
 var arches = map[string]func(){
-	"386":     gen386,
+	// "386":     gen386,
 	"amd64":   genAMD64,
-	"arm":     genARM,
-	"arm64":   genARM64,
-	"loong64": genLoong64,
-	"mips64x": func() { genMIPS(true) },
-	"mipsx":   func() { genMIPS(false) },
-	"ppc64x":  genPPC64,
-	"riscv64": genRISCV64,
-	"s390x":   genS390X,
-	"wasm":    genWasm,
+	// "arm":     genARM,
+	// "arm64":   genARM64,
+	// "loong64": genLoong64,
+	// "mips64x": func() { genMIPS(true) },
+	// "mipsx":   func() { genMIPS(false) },
+	// "ppc64x":  genPPC64,
+	// "riscv64": genRISCV64,
+	// "s390x":   genS390X,
+	// "wasm":    genWasm,
 }
 var beLe = map[string]bool{"mips64x": true, "mipsx": true, "ppc64x": true}
 
