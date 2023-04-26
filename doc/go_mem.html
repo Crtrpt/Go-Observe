@@ -19,8 +19,9 @@ observe values produced by writes to the same variable in a different goroutine.
 </p>
 
 
-<h3 id="advice">Advice</h3>
+<h3 id="advice">建议</h3>
 
+不同协程之间的访问必须序列化访问 使用 sync 和 sync/atomic
 <p>
 Programs that modify data being simultaneously accessed by multiple goroutines
 must serialize such access.
@@ -38,7 +39,7 @@ you are being too clever.
 </p>
 
 <p>
-Don't be clever.
+别耍小聪明
 </p>
 
 <h3 id="overview">Informal Overview</h3>
