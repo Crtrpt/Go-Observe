@@ -26,9 +26,9 @@ Flags:
 		Search for #include files in dir1, dir2, etc,
 		after consulting $GOROOT/pkg/$GOOS_$GOARCH.
 	-S
-		Print assembly and machine code.
+		Print assembly and machine code. 打印汇编和机器码
 	-V
-		Print assembler version and exit.
+		Print assembler version and exit. 打印汇编器版本 并且退出
 	-debug
 		Dump instructions as they are parsed.
 	-dynlink
