@@ -428,12 +428,12 @@ func stackalloc(n uint32) stack {
 	if raceenabled {
 		racemalloc(v, uintptr(n))
 	}
-	if msanenabled {
-		msanmalloc(v, uintptr(n))
-	}
-	if asanenabled {
-		asanunpoison(v, uintptr(n))
-	}
+	// if msanenabled {
+	// 	msanmalloc(v, uintptr(n))
+	// }
+	// if asanenabled {
+	// 	asanunpoison(v, uintptr(n))
+	// }
 	if stackDebug >= 1 {
 		print("  allocated ", v, "\n")
 	}
@@ -468,12 +468,12 @@ func stackfree(stk stack) {
 		}
 		return
 	}
-	if msanenabled {
-		msanfree(v, n)
-	}
-	if asanenabled {
-		asanpoison(v, n)
-	}
+	// if msanenabled {
+	// 	msanfree(v, n)
+	// }
+	// if asanenabled {
+	// 	asanpoison(v, n)
+	// }
 	if n < _FixedStack<<_NumStackOrders && n < _StackCacheSize {
 		order := uint8(0)
 		n2 := n

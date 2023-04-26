@@ -89,6 +89,7 @@ import (
 	"unsafe"
 )
 
+
 // Functions starting with arena_ are meant to be exported to downstream users
 // of arenas. They should wrap these functions in a higher-lever API.
 //
@@ -333,7 +334,8 @@ func (a *userArena) free() {
 	// Note that active's reference is always the last reference in refs.
 	s = a.active
 	if s != nil {
-		if raceenabled || msanenabled || asanenabled {
+		// if raceenabled || msanenabled || asanenabled {
+		if raceenabled {
 			// Don't reuse arenas with sanitizers enabled. We want to catch
 			// any use-after-free errors aggressively.
 			freeUserArenaChunk(s, a.refs[len(a.refs)-1])
@@ -678,20 +680,20 @@ func newUserArenaChunk() (unsafe.Pointer, *mspan) {
 		racemalloc(unsafe.Pointer(span.base()), span.elemsize)
 	}
 
-	if msanenabled {
-		// TODO(mknyszek): Track individual objects.
-		msanmalloc(unsafe.Pointer(span.base()), span.elemsize)
-	}
+	// if msanenabled {
+	// 	// TODO(mknyszek): Track individual objects.
+	// 	msanmalloc(unsafe.Pointer(span.base()), span.elemsize)
+	// }
 
-	if asanenabled {
-		// TODO(mknyszek): Track individual objects.
-		rzSize := computeRZlog(span.elemsize)
-		span.elemsize -= rzSize
-		span.limit -= rzSize
-		span.userArenaChunkFree = makeAddrRange(span.base(), span.limit)
-		asanpoison(unsafe.Pointer(span.limit), span.npages*pageSize-span.elemsize)
-		asanunpoison(unsafe.Pointer(span.base()), span.elemsize)
-	}
+	// if asanenabled {
+	// 	// TODO(mknyszek): Track individual objects.
+	// 	rzSize := computeRZlog(span.elemsize)
+	// 	span.elemsize -= rzSize
+	// 	span.limit -= rzSize
+	// 	span.userArenaChunkFree = makeAddrRange(span.base(), span.limit)
+	// 	asanpoison(unsafe.Pointer(span.limit), span.npages*pageSize-span.elemsize)
+	// 	asanunpoison(unsafe.Pointer(span.base()), span.elemsize)
+	// }
 
 	if rate := MemProfileRate; rate > 0 {
 		c := getMCache(mp)
@@ -848,12 +850,12 @@ func freeUserArenaChunk(s *mspan, x unsafe.Pointer) {
 	if raceenabled {
 		racefree(unsafe.Pointer(s.base()), s.elemsize)
 	}
-	if msanenabled {
-		msanfree(unsafe.Pointer(s.base()), s.elemsize)
-	}
-	if asanenabled {
-		asanpoison(unsafe.Pointer(s.base()), s.elemsize)
-	}
+	// if msanenabled {
+	// 	msanfree(unsafe.Pointer(s.base()), s.elemsize)
+	// }
+	// if asanenabled {
+	// 	asanpoison(unsafe.Pointer(s.base()), s.elemsize)
+	// }
 
 	// Make ourselves non-preemptible as we manipulate state and statistics.
 	//

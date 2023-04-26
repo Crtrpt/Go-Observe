@@ -400,12 +400,12 @@ func mapaccess1(t *maptype, h *hmap, key unsafe.Pointer) unsafe.Pointer {
 		racereadpc(unsafe.Pointer(h), callerpc, pc)
 		raceReadObjectPC(t.key, key, callerpc, pc)
 	}
-	if msanenabled && h != nil {
-		msanread(key, t.key.size)
-	}
-	if asanenabled && h != nil {
-		asanread(key, t.key.size)
-	}
+	// if msanenabled && h != nil {
+	// 	msanread(key, t.key.size)
+	// }
+	// if asanenabled && h != nil {
+	// 	asanread(key, t.key.size)
+	// }
 	if h == nil || h.count == 0 {
 		if t.hashMightPanic() {
 			t.hasher(key, 0) // see issue 23734
@@ -461,12 +461,12 @@ func mapaccess2(t *maptype, h *hmap, key unsafe.Pointer) (unsafe.Pointer, bool) 
 		racereadpc(unsafe.Pointer(h), callerpc, pc)
 		raceReadObjectPC(t.key, key, callerpc, pc)
 	}
-	if msanenabled && h != nil {
-		msanread(key, t.key.size)
-	}
-	if asanenabled && h != nil {
-		asanread(key, t.key.size)
-	}
+	// if msanenabled && h != nil {
+	// 	msanread(key, t.key.size)
+	// }
+	// if asanenabled && h != nil {
+	// 	asanread(key, t.key.size)
+	// }
 	if h == nil || h.count == 0 {
 		if t.hashMightPanic() {
 			t.hasher(key, 0) // see issue 23734
@@ -586,12 +586,12 @@ func mapassign(t *maptype, h *hmap, key unsafe.Pointer) unsafe.Pointer {
 		racewritepc(unsafe.Pointer(h), callerpc, pc)
 		raceReadObjectPC(t.key, key, callerpc, pc)
 	}
-	if msanenabled {
-		msanread(key, t.key.size)
-	}
-	if asanenabled {
-		asanread(key, t.key.size)
-	}
+	// if msanenabled {
+	// 	msanread(key, t.key.size)
+	// }
+	// if asanenabled {
+	// 	asanread(key, t.key.size)
+	// }
 	if h.flags&hashWriting != 0 {
 		fatal("concurrent map writes")
 	}
@@ -700,12 +700,12 @@ func mapdelete(t *maptype, h *hmap, key unsafe.Pointer) {
 		racewritepc(unsafe.Pointer(h), callerpc, pc)
 		raceReadObjectPC(t.key, key, callerpc, pc)
 	}
-	if msanenabled && h != nil {
-		msanread(key, t.key.size)
-	}
-	if asanenabled && h != nil {
-		asanread(key, t.key.size)
-	}
+	// if msanenabled && h != nil {
+	// 	msanread(key, t.key.size)
+	// }
+	// if asanenabled && h != nil {
+	// 	asanread(key, t.key.size)
+	// }
 	if h == nil || h.count == 0 {
 		if t.hashMightPanic() {
 			t.hasher(key, 0) // see issue 23734

@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -572,45 +571,6 @@ func setup() {
 // duplicated here to avoid version skew in the MustLinkExternal function
 // during bootstrapping.
 func mustLinkExternal(goos, goarch string, cgoEnabled bool) bool {
-	if cgoEnabled {
-		switch goarch {
-		case "loong64",
-			"mips", "mipsle", "mips64", "mips64le",
-			"riscv64":
-			// Internally linking cgo is incomplete on some architectures.
-			// https://golang.org/issue/14449
-			return true
-		case "arm64":
-			if goos == "windows" {
-				// windows/arm64 internal linking is not implemented.
-				return true
-			}
-		case "ppc64":
-			// Big Endian PPC64 cgo internal linking is not implemented for aix or linux.
-			return true
-		}
-
-		switch goos {
-		case "android":
-			return true
-		case "dragonfly":
-			// It seems that on Dragonfly thread local storage is
-			// set up by the dynamic linker, so internal cgo linking
-			// doesn't work. Test case is "go test runtime/cgo".
-			return true
-		}
-	}
-
-	switch goos {
-	case "android":
-		if goarch != "arm64" {
-			return true
-		}
-	case "ios":
-		if goarch == "arm64" {
-			return true
-		}
-	}
 	return false
 }
 
@@ -1324,35 +1284,8 @@ var (
 )
 
 func timelog(op, name string) {
-	if !timeLogEnabled {
-		return
-	}
-	timeLogMu.Lock()
-	defer timeLogMu.Unlock()
-	if timeLogFile == nil {
-		f, err := os.OpenFile(os.Getenv("GOBUILDTIMELOGFILE"), os.O_RDWR|os.O_APPEND, 0666)
-		if err != nil {
-			log.Fatal(err)
-		}
-		buf := make([]byte, 100)
-		n, _ := f.Read(buf)
-		s := string(buf[:n])
-		if i := strings.Index(s, "\n"); i >= 0 {
-			s = s[:i]
-		}
-		i := strings.Index(s, " start")
-		if i < 0 {
-			log.Fatalf("time log %s does not begin with start line", os.Getenv("GOBUILDTIMELOGFILE"))
-		}
-		t, err := time.Parse(time.UnixDate, s[:i])
-		if err != nil {
-			log.Fatalf("cannot parse time log line %q: %v", s, err)
-		}
-		timeLogStart = t
-		timeLogFile = f
-	}
 	t := time.Now()
-	fmt.Fprintf(timeLogFile, "%s %+.1fs %s %s\n", t.Format(time.UnixDate), t.Sub(timeLogStart).Seconds(), op, name)
+	fmt.Printf( "%s %+.1fs %s %s\n", t.Format(time.UnixDate), t.Sub(timeLogStart).Seconds(), op, name)
 }
 
 // toolenv returns the environment to use when building commands in cmd.

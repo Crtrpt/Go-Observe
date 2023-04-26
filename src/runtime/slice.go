@@ -73,12 +73,12 @@ func makeslicecopy(et *_type, tolen int, fromlen int, from unsafe.Pointer) unsaf
 		pc := abi.FuncPCABIInternal(makeslicecopy)
 		racereadrangepc(from, copymem, callerpc, pc)
 	}
-	if msanenabled {
-		msanread(from, copymem)
-	}
-	if asanenabled {
-		asanread(from, copymem)
-	}
+	// if msanenabled {
+	// 	msanread(from, copymem)
+	// }
+	// if asanenabled {
+	// 	asanread(from, copymem)
+	// }
 
 	memmove(to, from, copymem)
 
@@ -160,12 +160,12 @@ func growslice(oldPtr unsafe.Pointer, newLen, oldCap, num int, et *_type) slice 
 		callerpc := getcallerpc()
 		racereadrangepc(oldPtr, uintptr(oldLen*int(et.size)), callerpc, abi.FuncPCABIInternal(growslice))
 	}
-	if msanenabled {
-		msanread(oldPtr, uintptr(oldLen*int(et.size)))
-	}
-	if asanenabled {
-		asanread(oldPtr, uintptr(oldLen*int(et.size)))
-	}
+	// if msanenabled {
+	// 	msanread(oldPtr, uintptr(oldLen*int(et.size)))
+	// }
+	// if asanenabled {
+	// 	asanread(oldPtr, uintptr(oldLen*int(et.size)))
+	// }
 
 	if newLen < 0 {
 		panic(errorString("growslice: len out of range"))
@@ -328,14 +328,14 @@ func slicecopy(toPtr unsafe.Pointer, toLen int, fromPtr unsafe.Pointer, fromLen 
 		racereadrangepc(fromPtr, size, callerpc, pc)
 		racewriterangepc(toPtr, size, callerpc, pc)
 	}
-	if msanenabled {
-		msanread(fromPtr, size)
-		msanwrite(toPtr, size)
-	}
-	if asanenabled {
-		asanread(fromPtr, size)
-		asanwrite(toPtr, size)
-	}
+	// if msanenabled {
+	// 	msanread(fromPtr, size)
+	// 	msanwrite(toPtr, size)
+	// }
+	// if asanenabled {
+	// 	asanread(fromPtr, size)
+	// 	asanwrite(toPtr, size)
+	// }
 
 	if size == 1 { // common case worth about 2x to do here
 		// TODO: is this still worth it with new memmove impl?

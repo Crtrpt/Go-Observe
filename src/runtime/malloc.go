@@ -959,13 +959,13 @@ func mallocgc(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
 	lockRankMayQueueFinalizer()
 
 	userSize := size
-	if asanenabled {
-		// Refer to ASAN runtime library, the malloc() function allocates extra memory,
-		// the redzone, around the user requested memory region. And the redzones are marked
-		// as unaddressable. We perform the same operations in Go to detect the overflows or
-		// underflows.
-		size += computeRZlog(size)
-	}
+	// if asanenabled {
+	// 	// Refer to ASAN runtime library, the malloc() function allocates extra memory,
+	// 	// the redzone, around the user requested memory region. And the redzones are marked
+	// 	// as unaddressable. We perform the same operations in Go to detect the overflows or
+	// 	// underflows.
+	// 	size += computeRZlog(size)
+	// }
 
 	if debug.malloc {
 		if debug.sbrk != 0 {
@@ -1185,20 +1185,20 @@ func mallocgc(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
 		racemalloc(x, size)
 	}
 
-	if msanenabled {
-		msanmalloc(x, size)
-	}
+	// if msanenabled {
+	// 	msanmalloc(x, size)
+	// }
 
-	if asanenabled {
-		// We should only read/write the memory with the size asked by the user.
-		// The rest of the allocated memory should be poisoned, so that we can report
-		// errors when accessing poisoned memory.
-		// The allocated memory is larger than required userSize, it will also include
-		// redzone and some other padding bytes.
-		rzBeg := unsafe.Add(x, userSize)
-		asanpoison(rzBeg, size-userSize)
-		asanunpoison(x, userSize)
-	}
+	// if asanenabled {
+	// 	// We should only read/write the memory with the size asked by the user.
+	// 	// The rest of the allocated memory should be poisoned, so that we can report
+	// 	// errors when accessing poisoned memory.
+	// 	// The allocated memory is larger than required userSize, it will also include
+	// 	// redzone and some other padding bytes.
+	// 	rzBeg := unsafe.Add(x, userSize)
+	// 	asanpoison(rzBeg, size-userSize)
+	// 	asanunpoison(x, userSize)
+	// }
 
 	if rate := MemProfileRate; rate > 0 {
 		// Note cache c only valid while m acquired; see #47302

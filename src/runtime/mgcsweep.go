@@ -589,7 +589,7 @@ func (sl *sweepLocked) sweep(preserve bool) bool {
 		spanHasNoSpecials(s)
 	}
 
-	if debug.allocfreetrace != 0 || debug.clobberfree != 0 || raceenabled || msanenabled || asanenabled {
+	if debug.allocfreetrace != 0 || debug.clobberfree != 0 || raceenabled  {
 		// Find all newly freed objects. This doesn't have to
 		// efficient; allocfreetrace has massive overhead.
 		mbits := s.markBitsForBase()
@@ -607,12 +607,12 @@ func (sl *sweepLocked) sweep(preserve bool) bool {
 				if raceenabled && !s.isUserArenaChunk {
 					racefree(unsafe.Pointer(x), size)
 				}
-				if msanenabled && !s.isUserArenaChunk {
-					msanfree(unsafe.Pointer(x), size)
-				}
-				if asanenabled && !s.isUserArenaChunk {
-					asanpoison(unsafe.Pointer(x), size)
-				}
+				// if msanenabled && !s.isUserArenaChunk {
+				// 	msanfree(unsafe.Pointer(x), size)
+				// }
+				// if asanenabled && !s.isUserArenaChunk {
+				// 	asanpoison(unsafe.Pointer(x), size)
+				// }
 			}
 			mbits.advance()
 			abits.advance()

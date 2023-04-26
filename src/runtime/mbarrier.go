@@ -201,14 +201,14 @@ func reflect_typedmemmove(typ *_type, dst, src unsafe.Pointer) {
 		raceWriteObjectPC(typ, dst, getcallerpc(), abi.FuncPCABIInternal(reflect_typedmemmove))
 		raceReadObjectPC(typ, src, getcallerpc(), abi.FuncPCABIInternal(reflect_typedmemmove))
 	}
-	if msanenabled {
-		msanwrite(dst, typ.size)
-		msanread(src, typ.size)
-	}
-	if asanenabled {
-		asanwrite(dst, typ.size)
-		asanread(src, typ.size)
-	}
+	// if msanenabled {
+	// 	msanwrite(dst, typ.size)
+	// 	msanread(src, typ.size)
+	// }
+	// if asanenabled {
+	// 	asanwrite(dst, typ.size)
+	// 	asanread(src, typ.size)
+	// }
 	typedmemmove(typ, dst, src)
 }
 
@@ -261,14 +261,14 @@ func typedslicecopy(typ *_type, dstPtr unsafe.Pointer, dstLen int, srcPtr unsafe
 		racewriterangepc(dstPtr, uintptr(n)*typ.size, callerpc, pc)
 		racereadrangepc(srcPtr, uintptr(n)*typ.size, callerpc, pc)
 	}
-	if msanenabled {
-		msanwrite(dstPtr, uintptr(n)*typ.size)
-		msanread(srcPtr, uintptr(n)*typ.size)
-	}
-	if asanenabled {
-		asanwrite(dstPtr, uintptr(n)*typ.size)
-		asanread(srcPtr, uintptr(n)*typ.size)
-	}
+	// if msanenabled {
+	// 	msanwrite(dstPtr, uintptr(n)*typ.size)
+	// 	msanread(srcPtr, uintptr(n)*typ.size)
+	// }
+	// if asanenabled {
+	// 	asanwrite(dstPtr, uintptr(n)*typ.size)
+	// 	asanread(srcPtr, uintptr(n)*typ.size)
+	// }
 
 	if goexperiment.CgoCheck2 {
 		cgoCheckSliceCopy(typ, dstPtr, srcPtr, n)

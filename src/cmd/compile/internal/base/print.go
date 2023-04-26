@@ -143,7 +143,8 @@ func ErrorfAt(pos src.XPos, code errors.Code, format string, args ...interface{}
 	numErrors++
 
 	hcrash()
-	if numErrors >= 10 && Flag.LowerE == 0 {
+	//调大错误数量
+	if numErrors >= 100 && Flag.LowerE == 0 {
 		FlushErrors()
 		fmt.Printf("%v: too many errors\n", FmtPos(pos))
 		ErrorExit()

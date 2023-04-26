@@ -322,12 +322,12 @@ func convT(t *_type, v unsafe.Pointer) unsafe.Pointer {
 	if raceenabled {
 		raceReadObjectPC(t, v, getcallerpc(), abi.FuncPCABIInternal(convT))
 	}
-	if msanenabled {
-		msanread(v, t.size)
-	}
-	if asanenabled {
-		asanread(v, t.size)
-	}
+	// if msanenabled {
+	// 	msanread(v, t.size)
+	// }
+	// if asanenabled {
+	// 	asanread(v, t.size)
+	// }
 	x := mallocgc(t.size, t, true)
 	typedmemmove(t, x, v)
 	return x
@@ -337,12 +337,12 @@ func convTnoptr(t *_type, v unsafe.Pointer) unsafe.Pointer {
 	if raceenabled {
 		raceReadObjectPC(t, v, getcallerpc(), abi.FuncPCABIInternal(convTnoptr))
 	}
-	if msanenabled {
-		msanread(v, t.size)
-	}
-	if asanenabled {
-		asanread(v, t.size)
-	}
+	// if msanenabled {
+	// 	msanread(v, t.size)
+	// }
+	// if asanenabled {
+	// 	asanread(v, t.size)
+	// }
 
 	x := mallocgc(t.size, t, false)
 	memmove(x, v, t.size)

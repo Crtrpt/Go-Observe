@@ -1546,18 +1546,18 @@ func (h *mheap) freeSpan(s *mspan) {
 		pageTraceFree(getg().m.p.ptr(), 0, s.base(), s.npages)
 
 		lock(&h.lock)
-		if msanenabled {
-			// Tell msan that this entire span is no longer in use.
-			base := unsafe.Pointer(s.base())
-			bytes := s.npages << _PageShift
-			msanfree(base, bytes)
-		}
-		if asanenabled {
-			// Tell asan that this entire span is no longer in use.
-			base := unsafe.Pointer(s.base())
-			bytes := s.npages << _PageShift
-			asanpoison(base, bytes)
-		}
+		// if msanenabled {
+		// 	// Tell msan that this entire span is no longer in use.
+		// 	base := unsafe.Pointer(s.base())
+		// 	bytes := s.npages << _PageShift
+		// 	msanfree(base, bytes)
+		// }
+		// if asanenabled {
+		// 	// Tell asan that this entire span is no longer in use.
+		// 	base := unsafe.Pointer(s.base())
+		// 	bytes := s.npages << _PageShift
+		// 	asanpoison(base, bytes)
+		// }
 		h.freeSpanLocked(s, spanAllocHeap)
 		unlock(&h.lock)
 	})

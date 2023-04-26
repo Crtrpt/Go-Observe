@@ -398,20 +398,20 @@ func selectgo(cas0 *scase, order0 *uint16, pc0 *uintptr, nsends, nrecvs int, blo
 			raceWriteObjectPC(c.elemtype, cas.elem, casePC(casi), chanrecvpc)
 		}
 	}
-	if msanenabled {
-		if casi < nsends {
-			msanread(cas.elem, c.elemtype.size)
-		} else if cas.elem != nil {
-			msanwrite(cas.elem, c.elemtype.size)
-		}
-	}
-	if asanenabled {
-		if casi < nsends {
-			asanread(cas.elem, c.elemtype.size)
-		} else if cas.elem != nil {
-			asanwrite(cas.elem, c.elemtype.size)
-		}
-	}
+	// if msanenabled {
+	// 	if casi < nsends {
+	// 		msanread(cas.elem, c.elemtype.size)
+	// 	} else if cas.elem != nil {
+	// 		msanwrite(cas.elem, c.elemtype.size)
+	// 	}
+	// }
+	// if asanenabled {
+	// 	if casi < nsends {
+	// 		asanread(cas.elem, c.elemtype.size)
+	// 	} else if cas.elem != nil {
+	// 		asanwrite(cas.elem, c.elemtype.size)
+	// 	}
+	// }
 
 	selunlock(scases, lockorder)
 	goto retc
@@ -424,12 +424,12 @@ bufrecv:
 		}
 		racenotify(c, c.recvx, nil)
 	}
-	if msanenabled && cas.elem != nil {
-		msanwrite(cas.elem, c.elemtype.size)
-	}
-	if asanenabled && cas.elem != nil {
-		asanwrite(cas.elem, c.elemtype.size)
-	}
+	// if msanenabled && cas.elem != nil {
+	// 	msanwrite(cas.elem, c.elemtype.size)
+	// }
+	// if asanenabled && cas.elem != nil {
+	// 	asanwrite(cas.elem, c.elemtype.size)
+	// }
 	recvOK = true
 	qp = chanbuf(c, c.recvx)
 	if cas.elem != nil {
@@ -450,12 +450,12 @@ bufsend:
 		racenotify(c, c.sendx, nil)
 		raceReadObjectPC(c.elemtype, cas.elem, casePC(casi), chansendpc)
 	}
-	if msanenabled {
-		msanread(cas.elem, c.elemtype.size)
-	}
-	if asanenabled {
-		asanread(cas.elem, c.elemtype.size)
-	}
+	// if msanenabled {
+	// 	msanread(cas.elem, c.elemtype.size)
+	// }
+	// if asanenabled {
+	// 	asanread(cas.elem, c.elemtype.size)
+	// }
 	typedmemmove(c.elemtype, chanbuf(c, c.sendx), cas.elem)
 	c.sendx++
 	if c.sendx == c.dataqsiz {
@@ -491,12 +491,12 @@ send:
 	if raceenabled {
 		raceReadObjectPC(c.elemtype, cas.elem, casePC(casi), chansendpc)
 	}
-	if msanenabled {
-		msanread(cas.elem, c.elemtype.size)
-	}
-	if asanenabled {
-		asanread(cas.elem, c.elemtype.size)
-	}
+	// if msanenabled {
+	// 	msanread(cas.elem, c.elemtype.size)
+	// }
+	// if asanenabled {
+	// 	asanread(cas.elem, c.elemtype.size)
+	// }
 	send(c, sg, cas.elem, func() { selunlock(scases, lockorder) }, 2)
 	if debugSelect {
 		print("syncsend: cas0=", cas0, " c=", c, "\n")

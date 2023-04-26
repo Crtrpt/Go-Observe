@@ -530,6 +530,15 @@ const (
 	freeMWait  = 2 // M still in use.
 )
 
+//===========
+// type gsignalStack struct{}
+
+// type sigTabT struct {
+// 	flags int32
+// 	name  string
+// }
+//===========
+
 type m struct {
 	g0      *g     // goroutine with scheduling stack
 	morebuf gobuf  // gobuf arg to morestack

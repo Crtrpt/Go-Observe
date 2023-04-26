@@ -712,12 +712,12 @@ func record(r *MemProfileRecord, b *bucket) {
 	if raceenabled {
 		racewriterangepc(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0), getcallerpc(), abi.FuncPCABIInternal(MemProfile))
 	}
-	if msanenabled {
-		msanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
-	}
-	if asanenabled {
-		asanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
-	}
+	// if msanenabled {
+	// 	msanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
+	// }
+	// if asanenabled {
+	// 	asanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
+	// }
 	copy(r.Stack0[:], b.stk())
 	for i := int(b.nstk); i < len(r.Stack0); i++ {
 		r.Stack0[i] = 0
@@ -770,12 +770,12 @@ func BlockProfile(p []BlockProfileRecord) (n int, ok bool) {
 			if raceenabled {
 				racewriterangepc(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0), getcallerpc(), abi.FuncPCABIInternal(BlockProfile))
 			}
-			if msanenabled {
-				msanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
-			}
-			if asanenabled {
-				asanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
-			}
+			// if msanenabled {
+			// 	msanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
+			// }
+			// if asanenabled {
+			// 	asanwrite(unsafe.Pointer(&r.Stack0[0]), unsafe.Sizeof(r.Stack0))
+			// }
 			i := copy(r.Stack0[:], b.stk())
 			for ; i < len(r.Stack0); i++ {
 				r.Stack0[i] = 0

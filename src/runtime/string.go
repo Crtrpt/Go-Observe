@@ -91,12 +91,12 @@ func slicebytetostring(buf *tmpBuf, ptr *byte, n int) string {
 			getcallerpc(),
 			abi.FuncPCABIInternal(slicebytetostring))
 	}
-	if msanenabled {
-		msanread(unsafe.Pointer(ptr), uintptr(n))
-	}
-	if asanenabled {
-		asanread(unsafe.Pointer(ptr), uintptr(n))
-	}
+	// if msanenabled {
+	// 	msanread(unsafe.Pointer(ptr), uintptr(n))
+	// }
+	// if asanenabled {
+	// 	asanread(unsafe.Pointer(ptr), uintptr(n))
+	// }
 	if n == 1 {
 		p := unsafe.Pointer(&staticuint64s[*ptr])
 		if goarch.BigEndian {
@@ -154,12 +154,12 @@ func slicebytetostringtmp(ptr *byte, n int) string {
 			getcallerpc(),
 			abi.FuncPCABIInternal(slicebytetostringtmp))
 	}
-	if msanenabled && n > 0 {
-		msanread(unsafe.Pointer(ptr), uintptr(n))
-	}
-	if asanenabled && n > 0 {
-		asanread(unsafe.Pointer(ptr), uintptr(n))
-	}
+	// if msanenabled && n > 0 {
+	// 	msanread(unsafe.Pointer(ptr), uintptr(n))
+	// }
+	// if asanenabled && n > 0 {
+	// 	asanread(unsafe.Pointer(ptr), uintptr(n))
+	// }
 	return unsafe.String(ptr, n)
 }
 
@@ -206,12 +206,12 @@ func slicerunetostring(buf *tmpBuf, a []rune) string {
 			getcallerpc(),
 			abi.FuncPCABIInternal(slicerunetostring))
 	}
-	if msanenabled && len(a) > 0 {
-		msanread(unsafe.Pointer(&a[0]), uintptr(len(a))*unsafe.Sizeof(a[0]))
-	}
-	if asanenabled && len(a) > 0 {
-		asanread(unsafe.Pointer(&a[0]), uintptr(len(a))*unsafe.Sizeof(a[0]))
-	}
+	// if msanenabled && len(a) > 0 {
+	// 	msanread(unsafe.Pointer(&a[0]), uintptr(len(a))*unsafe.Sizeof(a[0]))
+	// }
+	// if asanenabled && len(a) > 0 {
+	// 	asanread(unsafe.Pointer(&a[0]), uintptr(len(a))*unsafe.Sizeof(a[0]))
+	// }
 	var dum [4]byte
 	size1 := 0
 	for _, r := range a {
