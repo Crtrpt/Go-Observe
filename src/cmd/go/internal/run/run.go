@@ -79,7 +79,9 @@ func printStderr(args ...any) (int, error) {
 	return fmt.Fprint(os.Stderr, args...)
 }
 
+//执行go run 命令
 func runRun(ctx context.Context, cmd *base.Command, args []string) {
+	//go mod
 	if shouldUseOutsideModuleMode(args) {
 		// Set global module flags for 'go run cmd@version'.
 		// This must be done before modload.Init, but we need to call work.BuildInit
@@ -89,6 +91,7 @@ func runRun(ctx context.Context, cmd *base.Command, args []string) {
 		modload.RootMode = modload.NoRoot
 		modload.AllowMissingModuleImports()
 		modload.Init()
+	// go work
 	} else {
 		modload.InitWorkfile()
 	}
