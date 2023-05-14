@@ -1,0 +1,20 @@
+[book]
+authors = ["jingdor"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Go Observe"
+
+[output.html]
+additional-css = ["style.css"]
+additional-js = ["sidebar.js"]
+input-404 = "not-found.md"
+
+[preprocessor.d2]
+layout = "dagre"
+inline = true
+output-dir = "d2"
+
+[output.html.fold]
+enable = true    # whether or not to enable section folding
+level = 1         # the depth to start folding
